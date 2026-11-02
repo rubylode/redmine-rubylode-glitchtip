@@ -1,0 +1,151 @@
+en:
+  rubylode_glitchtip:
+    plugin_name: Rubylode GlitchTip
+    status:
+      clear: No errors need attention
+      issues_need_attention:
+        one: "%{count} issue needs attention"
+        other: "%{count} issues need attention"
+      events:
+        one: "%{count} event"
+        other: "%{count} events"
+      unavailable: Status unavailable
+      more_issues:
+        one: "and %{count} more issue"
+        other: "and %{count} more issues"
+    columns:
+      issue: Issue
+      project: Project
+      level: Level
+      events: Events
+      last_seen: Last seen
+    levels:
+      fatal: Fatal
+      error: Error
+      warning: Warning
+      info: Info
+      debug: Debug
+      unknown: Unknown
+    last_seen_ago: "%{time} ago"
+    open_in_glitchtip: Open in GlitchTip
+    hints:
+      not_configured: "Recent errors are not set up yet. Add the GlitchTip address and the organization in the plugin settings."
+      not_configured_link: Open the settings
+      reason: "Why: %{reason}"
+    page_title: Errors needing attention
+    errors:
+      base_url_invalid: The GlitchTip address must start with http:// or https://
+      organization_slug_invalid: The organization slug may only use letters, digits, dashes and underscores
+      environment_variable_invalid: "The token variable name must start with GLITCHTIP_ and use only capital letters, digits and underscores"
+      plain_http_not_allowed: "A plain http address is only allowed for localhost; tick \"Allow plain http\" for an internal network, or use https"
+      allowed_hosts_invalid: "The extra hosts may only hold host names (letters, digits, dots and dashes) separated by commas, spaces or lines"
+      host_not_allowed: "GlitchTip's address is not on the list of hosts the token may be sent to"
+      transport_not_allowed: "The token is only sent over https (or plain http to localhost, or when plain http is allowed in the settings)"
+      token_variable_not_allowed: "The token variable name must start with GLITCHTIP_, so no token is used"
+      glitchtip_redirected: "GlitchTip answered with a redirect, which is not followed"
+      number_invalid: "%{field} must be a whole number of at least %{minimum}"
+      number_between: "%{field} must be a whole number from %{minimum} to %{maximum}"
+      levels_none: Choose at least one level
+      levels_unknown: The levels must be among fatal, error, warning, info and debug
+      project_allow_list_invalid: The project list may only hold project slugs (letters, digits, dashes and underscores) separated by commas, spaces or lines
+      column_invalid: The welcome page and project Overview columns must be left or right
+      path_pattern_line: "Paths, line %{line_number}: a path pattern starts with one / and has no web address, spaces or more than %{maximum} characters"
+      path_patterns_too_many: "Paths: use at most %{maximum} patterns"
+      visibility_invalid: Who may see the block must be one of the listed choices
+      block_title_blank: The block title cannot be empty
+      token_missing: GlitchTip token is not set
+      glitchtip_status: "GlitchTip answered %{status}"
+      glitchtip_unreachable: "GlitchTip could not be reached (%{error_class})"
+      glitchtip_unreadable: GlitchTip sent an answer that could not be read
+      glitchtip_did_not_answer: GlitchTip did not answer
+    settings:
+      base_url: GlitchTip address
+      base_url_hint: "The address of your GlitchTip, for example https://glitchtip.example.com. Empty means the block is not shown to anyone but administrators, who get a hint."
+      organization_slug: Organization slug
+      organization_slug_hint: "The organization's short name, as in GlitchTip's address after the host."
+      token_environment_variable: Name of the token environment variable
+      token_environment_variable_hint: "The token itself is never saved here: put an API token with read access to issues in this environment variable. The name must start with GLITCHTIP_ before Redmine starts. It is sent as a bearer token."
+      token_is_set: "set in the environment"
+      token_is_not_set: "not set in the environment"
+      allowed_hosts: Extra hosts for the token
+      allowed_hosts_hint: "Optional. The token is sent only to the host of the address above; list further host names (commas, spaces or lines) the token may also go to. Redirects are never followed."
+      allow_plain_http: Allow plain http (internal network)
+      allow_plain_http_hint: "Addresses starting with http:// are refused unless the host is localhost or this is ticked. The token travels unencrypted then; use it only on a network you trust."
+      placements: Show the block on
+      show_on_my_page: My page
+      show_on_my_page_hint: "Keeps the block usable on My page (add it from the block list there). Off makes it draw nothing even where someone added it."
+      show_on_welcome_page: Welcome page
+      show_on_welcome_page_hint: "Adds the block to Redmine's home page, for the people allowed to see it."
+      welcome_page_column: Welcome page column
+      project_overview_column: Project Overview column
+      show_on_project_overview: Project Overview page
+      show_on_project_overview_hint: "Adds the block to every project's Overview page."
+      column_left: Left
+      column_right: Right
+      path_patterns: Pages matching these paths
+      path_patterns_hint: "One path pattern per line, for example /issues or /projects/*/issues. A * matches any characters. The query string and a trailing slash are ignored. The compact block is drawn at the end of the page. Settings, administration and sign-in pages are never matched unless a pattern names them."
+      show_in_top_menu: Show in the top menu
+      show_in_top_menu_hint: "Adds a link to the page /glitchtip_errors to the top menu, for the people allowed to see the block."
+      lookback_hours: Look-back hours
+      lookback_hours_hint: "An issue needs attention when it was seen again within this many hours."
+      minimum_event_count: Minimum event count
+      minimum_event_count_hint: "Issues with fewer events in total are left out."
+      levels: Levels to include
+      maximum_rows: Maximum rows
+      maximum_rows_hint: "Up to 100. The summary still counts every issue that needs attention."
+      project_allow_list: Projects
+      project_allow_list_hint: "Optional. GlitchTip project slugs, separated by commas, spaces or lines. Empty means all projects."
+      cache_seconds: Cache seconds
+      cache_seconds_hint: "GlitchTip is asked at most once in this many seconds."
+      failure_cache_seconds: Failure cache seconds
+      failure_cache_seconds_hint: "After a failed answer GlitchTip is left alone for this long."
+      timeout_seconds: Timeout seconds
+      block_title: Block title
+      visibility: Who may see the block
+      visibility_logged_in: Everyone who is signed in
+      visibility_admins: Administrators only
+    help:
+      heading: How to show the block on other pages
+      intro: "The block is one partial, so every place below shows the same thing, for the same people (the setting Who may see the block), from the same cached answer."
+      macro_heading: In text (wiki pages, news, issue descriptions and comments, forum messages, the project description and the welcome text)
+      macro_text: "Type the macro. It works wherever Redmine formats text with its wiki syntax. This includes the welcome text under Administration, Settings, General: Redmine draws it with its text formatter (textilizable), so a macro in it works like one in a wiki page."
+      macro_title_text: "Give it a title of its own with title=..."
+      my_page_heading: On My page
+      my_page_text: "Open My page, choose Personalize this page, pick Errors needing attention from the list and Add. Each person adds it for themselves."
+      paths_heading: At the end of chosen pages
+      paths_text: "List path patterns in the setting above, one per line. * matches any characters; the query string and a trailing slash are ignored."
+      partial_heading: In a theme or another plugin
+      partial_text: "Render the partial. Optional locals: title (a heading of its own), show_title (false hides the heading), compact (true for the smaller block, without project and culprit), inline_stylesheet (true when the page's head is already sent)."
+      page_heading: As a page, and in the top menu
+      page_text: "The page is /glitchtip_errors, and the setting Show in the top menu adds a link to it. Redmine has no screen for custom top-menu links, so the plugin registers its own menu item (a plugin menu item, Redmine::Plugin#menu) and shows it while that setting is ticked."
+      table_heading: All the places
+      table_place: Place
+      table_how: How
+      table_setting: Needs a setting
+      place_wiki: Wiki pages, news, issues, forums, project description
+      place_welcome_text: Welcome text
+      place_my_page: My page
+      place_welcome_page: Welcome page
+      place_overview: Project Overview page
+      place_paths: Any other page
+      place_partial: A theme or another plugin
+      place_page: Its own page
+      place_top_menu: Top menu
+      how_macro: "{{glitchtip_errors}}"
+      how_welcome_text: "{{glitchtip_errors}} in Administration, Settings, General"
+      how_my_page: "Personalize this page, then Add"
+      how_welcome_page: "Tick Welcome page"
+      how_overview: "Tick Project Overview page"
+      how_paths: "List the path, such as /issues"
+      how_partial: "render partial: \"rubylode_glitchtip/errors\""
+      how_page: "Open /glitchtip_errors"
+      how_top_menu: "Tick Show in the top menu"
+      needs_none: "No"
+      needs_my_page: "Show on My page (on by default)"
+      needs_welcome_page: "Yes: Welcome page"
+      needs_overview: "Yes: Project Overview page"
+      needs_paths: "Yes: Pages matching these paths"
+      needs_top_menu: "Yes: Show in the top menu"
+  my:
+    blocks:
+      rubylode_glitchtip_errors: Errors needing attention

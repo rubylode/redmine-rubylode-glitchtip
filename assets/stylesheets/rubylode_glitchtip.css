@@ -1,0 +1,227 @@
+/*
+ * Rubylode GlitchTip. Every colour and size is a custom property on .rubylode-glitchtip-errors, so a theme restyles the
+ * block by setting them. Where the theme already has a variable (Redmine 7 ships --oc-* colours) the default follows it.
+ */
+.rubylode-glitchtip-errors {
+  --rubylode-glitchtip-text: var(--oc-gray-9, #212529);
+  --rubylode-glitchtip-text-muted: var(--oc-gray-6, #6b7480);
+  --rubylode-glitchtip-border: var(--oc-gray-3, #dee2e6);
+  --rubylode-glitchtip-header-background: var(--oc-gray-1, #f1f3f5);
+  --rubylode-glitchtip-row-hover-background: var(--oc-gray-0, #f8f9fa);
+  --rubylode-glitchtip-clear-color: var(--oc-green-8, #2b8a3e);
+  --rubylode-glitchtip-clear-background: #e9f6ec;
+  --rubylode-glitchtip-attention-color: var(--oc-red-8, #c92a2a);
+  --rubylode-glitchtip-attention-background: #fdecec;
+  --rubylode-glitchtip-fatal-color: var(--oc-red-9, #a61e1e);
+  --rubylode-glitchtip-error-color: var(--oc-red-6, #e03131);
+  --rubylode-glitchtip-warning-color: var(--oc-orange-7, #d9730d);
+  --rubylode-glitchtip-info-color: var(--oc-blue-6, #1c7ed6);
+  --rubylode-glitchtip-unknown-color: var(--oc-gray-6, #868e96);
+  --rubylode-glitchtip-unavailable-color: var(--oc-orange-9, #a15c07);
+  --rubylode-glitchtip-unavailable-background: #fff4e0;
+  --rubylode-glitchtip-link-color: var(--oc-blue-8, #1b4f80);
+  --rubylode-glitchtip-dot-size: 10px;
+  --rubylode-glitchtip-radius: 6px;
+  --rubylode-glitchtip-gap: 12px;
+  --rubylode-glitchtip-summary-font-size: 1.05em;
+  --rubylode-glitchtip-culprit-font-size: 0.85em;
+
+  color: var(--rubylode-glitchtip-text);
+  margin-bottom: var(--rubylode-glitchtip-gap);
+}
+
+@media (prefers-color-scheme: dark) {
+  .rubylode-glitchtip-errors {
+    --rubylode-glitchtip-text: #e9ecef;
+    --rubylode-glitchtip-text-muted: #9aa3ad;
+    --rubylode-glitchtip-border: #3b4148;
+    --rubylode-glitchtip-header-background: #2a2f35;
+    --rubylode-glitchtip-row-hover-background: #242a30;
+    --rubylode-glitchtip-clear-color: #69db7c;
+    --rubylode-glitchtip-clear-background: #16301d;
+    --rubylode-glitchtip-attention-color: #ff8787;
+    --rubylode-glitchtip-attention-background: #3b1a1a;
+    --rubylode-glitchtip-fatal-color: #ffa8a8;
+    --rubylode-glitchtip-error-color: #ff8787;
+    --rubylode-glitchtip-warning-color: #ffc078;
+    --rubylode-glitchtip-info-color: #74c0fc;
+    --rubylode-glitchtip-unavailable-color: #ffc078;
+    --rubylode-glitchtip-unavailable-background: #3a2b12;
+    --rubylode-glitchtip-link-color: #74c0fc;
+  }
+}
+
+/* A theme that marks its dark mode on the page wins over the system setting. */
+:root[data-theme="dark"] .rubylode-glitchtip-errors,
+:root[data-color-scheme="dark"] .rubylode-glitchtip-errors,
+body.dark .rubylode-glitchtip-errors {
+  --rubylode-glitchtip-text: #e9ecef;
+  --rubylode-glitchtip-text-muted: #9aa3ad;
+  --rubylode-glitchtip-border: #3b4148;
+  --rubylode-glitchtip-header-background: #2a2f35;
+  --rubylode-glitchtip-row-hover-background: #242a30;
+  --rubylode-glitchtip-clear-color: #69db7c;
+  --rubylode-glitchtip-clear-background: #16301d;
+  --rubylode-glitchtip-attention-color: #ff8787;
+  --rubylode-glitchtip-attention-background: #3b1a1a;
+  --rubylode-glitchtip-fatal-color: #ffa8a8;
+  --rubylode-glitchtip-error-color: #ff8787;
+  --rubylode-glitchtip-warning-color: #ffc078;
+  --rubylode-glitchtip-info-color: #74c0fc;
+  --rubylode-glitchtip-unavailable-color: #ffc078;
+  --rubylode-glitchtip-unavailable-background: #3a2b12;
+  --rubylode-glitchtip-link-color: #74c0fc;
+}
+
+.rubylode-glitchtip-errors a {
+  color: var(--rubylode-glitchtip-link-color);
+}
+
+.rubylode-glitchtip-errors-title {
+  margin: 0 0 6px;
+}
+
+.rubylode-glitchtip-errors-summary {
+  display: inline-block;
+  margin: 0 0 var(--rubylode-glitchtip-gap);
+  padding: 4px 12px;
+  border-radius: var(--rubylode-glitchtip-radius);
+  font-size: var(--rubylode-glitchtip-summary-font-size);
+  font-weight: 600;
+}
+
+.rubylode-glitchtip-errors-summary.is-clear {
+  color: var(--rubylode-glitchtip-clear-color);
+  background: var(--rubylode-glitchtip-clear-background);
+}
+
+.rubylode-glitchtip-errors-summary.is-needs-attention {
+  color: var(--rubylode-glitchtip-attention-color);
+  background: var(--rubylode-glitchtip-attention-background);
+}
+
+.rubylode-glitchtip-errors-summary.is-unavailable {
+  color: var(--rubylode-glitchtip-unavailable-color);
+  background: var(--rubylode-glitchtip-unavailable-background);
+}
+
+.rubylode-glitchtip-errors-hint,
+.rubylode-glitchtip-errors-more {
+  margin: 0 0 var(--rubylode-glitchtip-gap);
+  color: var(--rubylode-glitchtip-text-muted);
+}
+
+table.list.rubylode-glitchtip-errors-table {
+  width: 100%;
+  border: 1px solid var(--rubylode-glitchtip-border);
+  border-collapse: collapse;
+  background: transparent;
+}
+
+table.list.rubylode-glitchtip-errors-table th,
+table.list.rubylode-glitchtip-errors-table td {
+  padding: 6px 10px;
+  border-bottom: 1px solid var(--rubylode-glitchtip-border);
+  text-align: left;
+  color: var(--rubylode-glitchtip-text);
+}
+
+table.list.rubylode-glitchtip-errors-table thead th {
+  background: var(--rubylode-glitchtip-header-background);
+}
+
+table.list.rubylode-glitchtip-errors-table tbody tr:hover td {
+  background: var(--rubylode-glitchtip-row-hover-background);
+}
+
+.rubylode-glitchtip-errors-culprit {
+  display: block;
+  font-size: var(--rubylode-glitchtip-culprit-font-size);
+  color: var(--rubylode-glitchtip-text-muted);
+  overflow-wrap: anywhere;
+}
+
+table.list.rubylode-glitchtip-errors-table td.rubylode-glitchtip-errors-project {
+  color: var(--rubylode-glitchtip-text-muted);
+}
+
+table.list.rubylode-glitchtip-errors-table .rubylode-glitchtip-errors-events,
+table.list.rubylode-glitchtip-errors-table .rubylode-glitchtip-errors-last-seen {
+  text-align: right;
+  white-space: nowrap;
+}
+
+.rubylode-glitchtip-errors-level {
+  white-space: nowrap;
+}
+
+.rubylode-glitchtip-errors-dot {
+  display: inline-block;
+  width: var(--rubylode-glitchtip-dot-size);
+  height: var(--rubylode-glitchtip-dot-size);
+  margin-right: 6px;
+  border-radius: 50%;
+  background: var(--rubylode-glitchtip-unknown-color);
+}
+
+.rubylode-glitchtip-errors-row.is-fatal .rubylode-glitchtip-errors-dot {
+  background: var(--rubylode-glitchtip-fatal-color);
+}
+
+.rubylode-glitchtip-errors-row.is-error .rubylode-glitchtip-errors-dot {
+  background: var(--rubylode-glitchtip-error-color);
+}
+
+.rubylode-glitchtip-errors-row.is-warning .rubylode-glitchtip-errors-dot {
+  background: var(--rubylode-glitchtip-warning-color);
+}
+
+.rubylode-glitchtip-errors-row.is-info .rubylode-glitchtip-errors-dot,
+.rubylode-glitchtip-errors-row.is-debug .rubylode-glitchtip-errors-dot {
+  background: var(--rubylode-glitchtip-info-color);
+}
+
+.rubylode-glitchtip-errors-row.is-fatal .rubylode-glitchtip-errors-level {
+  color: var(--rubylode-glitchtip-fatal-color);
+  font-weight: 600;
+}
+
+@media (max-width: 600px) {
+  table.list.rubylode-glitchtip-errors-table .rubylode-glitchtip-errors-project,
+  table.list.rubylode-glitchtip-errors-table .rubylode-glitchtip-errors-culprit {
+    display: none;
+  }
+}
+
+/* The compact variant, drawn at the end of a page chosen by a path pattern: no project column, no culprit. */
+.rubylode-glitchtip-errors.is-compact {
+  margin-top: var(--rubylode-glitchtip-gap);
+  font-size: 0.92em;
+}
+
+.rubylode-glitchtip-errors.is-compact table.list.rubylode-glitchtip-errors-table .rubylode-glitchtip-errors-project,
+.rubylode-glitchtip-errors.is-compact .rubylode-glitchtip-errors-culprit {
+  display: none;
+}
+
+/* The help on the settings page. Redmine's tabular form indents every paragraph for a label, which text does not need. */
+.rubylode-glitchtip-help p,
+.tabular .rubylode-glitchtip-help p {
+  margin-left: 0;
+  padding-left: 0;
+  clear: both;
+}
+
+.rubylode-glitchtip-help h4 {
+  margin: 1.2em 0 0.3em;
+  border-bottom: 0;
+}
+
+.rubylode-glitchtip-help pre {
+  overflow-x: auto;
+  white-space: pre-wrap;
+}
+
+.rubylode-glitchtip-help table.list td {
+  text-align: left;
+}

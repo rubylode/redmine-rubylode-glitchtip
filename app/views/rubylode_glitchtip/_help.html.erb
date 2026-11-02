@@ -1,0 +1,54 @@
+<%# The "how to show the block on other pages" help, drawn at the end of the plugin's settings. %>
+<% scope = "rubylode_glitchtip.help" %>
+<% content_for :header_tags, stylesheet_link_tag("rubylode_glitchtip", plugin: "redmine_rubylode_glitchtip") %>
+<div class="rubylode-glitchtip-help">
+  <h3><%= l("#{scope}.heading") %></h3>
+  <p><%= l("#{scope}.intro") %></p>
+
+  <h4><%= l("#{scope}.macro_heading") %></h4>
+  <p><%= l("#{scope}.macro_text") %></p>
+  <pre><code>{{glitchtip_errors}}
+{{glitchtip_errors(title=Production errors)}}</code></pre>
+  <p><%= l("#{scope}.macro_title_text") %></p>
+
+  <h4><%= l("#{scope}.my_page_heading") %></h4>
+  <p><%= l("#{scope}.my_page_text") %></p>
+
+  <h4><%= l("#{scope}.paths_heading") %></h4>
+  <p><%= l("#{scope}.paths_text") %></p>
+  <pre><code>/issues
+/projects/*/issues
+/projects/*/wiki/*</code></pre>
+
+  <h4><%= l("#{scope}.partial_heading") %></h4>
+  <p><%= l("#{scope}.partial_text") %></p>
+  <pre><code>&lt;%= render partial: "rubylode_glitchtip/errors" %&gt;
+&lt;%= render partial: "rubylode_glitchtip/errors", locals: { title: "Production errors", compact: true } %&gt;</code></pre>
+
+  <h4><%= l("#{scope}.page_heading") %></h4>
+  <p><%= l("#{scope}.page_text") %></p>
+
+  <h4><%= l("#{scope}.table_heading") %></h4>
+  <table class="list rubylode-glitchtip-help-table">
+    <thead>
+      <tr>
+        <th><%= l("#{scope}.table_place") %></th>
+        <th><%= l("#{scope}.table_how") %></th>
+        <th><%= l("#{scope}.table_setting") %></th>
+      </tr>
+    </thead>
+    <tbody>
+      <% [%w[place_wiki how_macro needs_none], %w[place_welcome_text how_welcome_text needs_none],
+          %w[place_my_page how_my_page needs_my_page], %w[place_welcome_page how_welcome_page needs_welcome_page],
+          %w[place_overview how_overview needs_overview], %w[place_paths how_paths needs_paths],
+          %w[place_partial how_partial needs_none], %w[place_page how_page needs_none],
+          %w[place_top_menu how_top_menu needs_top_menu]].each do |place, how, needs| %>
+        <tr>
+          <td><%= l("#{scope}.#{place}") %></td>
+          <td><code><%= l("#{scope}.#{how}") %></code></td>
+          <td><%= l("#{scope}.#{needs}") %></td>
+        </tr>
+      <% end %>
+    </tbody>
+  </table>
+</div>

@@ -1,0 +1,49 @@
+# A throwaway Redmine 7 to try the plugin in, with a fake GlitchTip next to it. Not a real tracker or a real GlitchTip.
+# Start: ruby bin/demo up, then open http://localhost:3014 (admin / admin).
+# The repository is mounted as the plugin, so a code change shows after "ruby bin/demo restart".
+# Wipe it: ruby bin/demo reset
+# Tests: ruby bin/test (runs the "test" service below)
+services:
+  redmine:
+    image: redmine:7.0.2
+    container_name: redmine-glitchtip-dev
+    ports:
+      - "127.0.0.1:3014:3000"
+    environment:
+      # The image ships without the development gems, so production is the mode it can boot in.
+      RAILS_ENV: production
+      # The name the plugin reads by default. The value is made up and only the fake GlitchTip below accepts it.
+      GLITCHTIP_API_TOKEN: demo-token-not-a-secret
+    depends_on:
+      - fake_glitchtip
+    volumes:
+      - .:/usr/src/redmine/plugins/redmine_rubylode_glitchtip
+      - redmine-glitchtip-files:/usr/src/redmine/files
+      - redmine-glitchtip-sqlite:/usr/src/redmine/sqlite
+
+  # Serves the issues list like GlitchTip's API. Switch what it reports with: ruby bin/demo scenario none
+  fake_glitchtip:
+    image: redmine:7.0.2
+    container_name: fake-glitchtip-dev
+    ports:
+      - "127.0.0.1:9114:9100"
+    environment:
+      FAKE_GLITCHTIP_TOKEN: demo-token-not-a-secret
+      FAKE_GLITCHTIP_PORT: "9100"
+    command: ruby /plugin/test/support/fake_glitchtip_server.rb
+    volumes:
+      - .:/plugin:ro
+
+  test:
+    build:
+      context: .
+      dockerfile: docker/test.Dockerfile
+    profiles: ["test"]
+    environment:
+      RAILS_ENV: test
+    volumes:
+      - .:/usr/src/redmine/plugins/redmine_rubylode_glitchtip
+
+volumes:
+  redmine-glitchtip-files:
+  redmine-glitchtip-sqlite:

@@ -1,0 +1,4 @@
+<%# "Show on My page" in the settings: when it is off, the block stays in the list but draws nothing. %>
+<% if RubylodeGlitchtip::Configuration.current.show_on_my_page? %>
+  <%= render partial: "rubylode_glitchtip/errors" %>
+<% end %>
