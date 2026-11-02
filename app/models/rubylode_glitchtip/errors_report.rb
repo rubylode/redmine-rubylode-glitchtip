@@ -42,6 +42,14 @@ module RubylodeGlitchtip
         "rubylode_glitchtip/issues/#{Digest::SHA256.hexdigest([base_url, organization_slug, lookback_hours].join('|'))[0, 16]}"
       end
 
+      # The report for a page. Whatever goes wrong while building it, the page gets a "status unavailable" report and never an error.
+      def safe_report(configuration = Configuration.current)
+        current(configuration).report
+      rescue StandardError => error
+        Rails.logger.warn("Rubylode GlitchTip: could not build the errors block: #{error.class}: #{error.message}")
+        Report.new([], 0, 0, 0, I18n.t("rubylode_glitchtip.status.unavailable"), true, error.class.name)
+      end
+
       def current(configuration = Configuration.current)
         now = Time.current
         new(rule: AttentionRule.new(now: now, lookback_hours: configuration.lookback_hours,
@@ -80,17 +88,35 @@ module RubylodeGlitchtip
     private
 
     def cached_answer
-      answer = @cache.read(@cache_key)
+      answer = read_cache
       return answer unless answer.nil?
 
       begin
         answer = { "issues" => @fetch_issues.call }
-        @cache.write(@cache_key, answer, expires_in: @cache_seconds) if @cache_seconds.positive?
+        write_cache(answer, @cache_seconds) if @cache_seconds.positive?
       rescue GlitchtipClient::Unavailable => error
         answer = { "failure" => error.message }
-        @cache.write(@cache_key, answer, expires_in: @failure_seconds) if @failure_seconds.positive?
+        write_cache(answer, @failure_seconds) if @failure_seconds.positive?
       end
       answer
+    end
+
+    # A cache that cannot be read or written (a file owned by another user, a full disk) is a miss, not an error.
+    def read_cache
+      @cache.read(@cache_key)
+    rescue StandardError => error
+      log_cache_problem("read", error)
+      nil
+    end
+
+    def write_cache(value, seconds)
+      @cache.write(@cache_key, value, expires_in: seconds)
+    rescue StandardError => error
+      log_cache_problem("write", error)
+    end
+
+    def log_cache_problem(action, error)
+      Rails.logger.warn("Rubylode GlitchTip: cache #{action} failed, carrying on without it: #{error.class}: #{error.message}")
     end
 
     # A cached entry that cannot be read as an issue is skipped, so one bad entry never takes the page down.

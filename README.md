@@ -230,6 +230,10 @@ Storefront project's wiki, and the block is on My page. Everything in the fake G
 The screenshots above come from `node script/screenshots.mjs` ([Playwright](https://playwright.dev); the script's header says
 how to install it).
 
+## Troubleshooting
+
+- **A cache problem never breaks the page.** If the cache store cannot be read or written (a cache file owned by another user, a full disk), the plugin logs a warning with the error class and message, treats it as an empty cache and fetches live; the page still answers.
+
 ## Tests
 
     bin/test                                         all unit and integration tests

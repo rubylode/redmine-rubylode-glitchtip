@@ -117,4 +117,60 @@ class RubylodeGlitchtip::ErrorsReportTest < ActiveSupport::TestCase
     refute_equal key, RubylodeGlitchtip::ErrorsReport.cache_key_for(BASE_URL, ORGANIZATION, 48)
     refute_includes key, "glitchtip.example.com"
   end
+
+  test "a cache that cannot be read or written still gives the report from a live fetch, and logs a warning" do
+    calls = 0
+    fetch = -> { calls += 1; [issue_hash] }
+    report = nil
+    log = captured_log { report = report_for([], fetch: fetch, cache: UnwritableCache.new).report }
+
+    refute report.unavailable?
+    assert_equal 1, report.total_issue_count
+    assert_equal 1, calls
+    assert_includes log, "WARN"
+    assert_includes log, "Errno::EACCES"
+  end
+
+  test "a cache that cannot be written still gives the report from a live fetch" do
+    report = nil
+    log = captured_log { report = report_for([issue_hash], cache: UnwritableCache.new(read: false)).report }
+
+    refute report.unavailable?
+    assert_equal 1, report.total_issue_count
+    assert_includes log, "cache write failed"
+  end
+
+  test "a failed fetch with a cache that cannot be written is the status unavailable report" do
+    failing = -> { raise RubylodeGlitchtip::GlitchtipClient::Unavailable, "GlitchTip answered 503" }
+    report = nil
+    captured_log { report = report_for([], fetch: failing, cache: UnwritableCache.new).report }
+
+    assert report.unavailable?
+    assert_equal "GlitchTip answered 503", report.failure_reason
+  end
+
+  test "any error from the cache store is ignored, not only system call errors" do
+    cache = Object.new
+    def cache.read(*) = raise(TypeError, "incompatible marshal file format")
+    def cache.write(*) = raise(IOError, "closed stream")
+    report = nil
+    captured_log { report = report_for([issue_hash], cache: cache).report }
+
+    refute report.unavailable?
+  end
+
+  test "safe_report answers status unavailable and logs the class when building the report raises" do
+    configuration = RubylodeGlitchtip::Configuration.current
+    report = nil
+    log = captured_log do
+      replacing_method(RubylodeGlitchtip::ErrorsReport, :current, ->(*) { raise ArgumentError, "boom" }) do
+        report = RubylodeGlitchtip::ErrorsReport.safe_report(configuration)
+      end
+    end
+
+    assert report.unavailable?
+    assert_equal "Status unavailable", report.summary
+    assert_equal "ArgumentError", report.failure_reason
+    assert_includes log, "ArgumentError: boom"
+  end
 end
