@@ -4,6 +4,11 @@ All notable changes to this plugin. The format follows [Keep a Changelog](https:
 
 ## [Unreleased]
 
+## [1.0.0] - 2026-11-02
+
+First stable release. Recent GlitchTip errors that may need attention, as a wiki macro, a page, a My page block and a partial, with placements chosen in the settings.
+Its name, author and version are ready to list on redmine.org, and the plugin now shows its project address on Administration, Plugins.
+
 ## [0.2.1] - 2026-11-02
 
 ### Fixed

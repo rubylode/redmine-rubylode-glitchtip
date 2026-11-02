@@ -4,7 +4,7 @@ TL;DR: the recent [GlitchTip](https://glitchtip.com) errors that may need attent
 a wiki macro, a page, a My page block and a partial, with a summary line, the project, level, event count, last seen and a
 link to the issue in GlitchTip.
 
-Status: version 0.2.0, Redmine 7 only. See `docs/roadmap/ROADMAP.md` for what is decided and what is still open.
+Status: version 1.0.0, Redmine 7 only. See `docs/roadmap/ROADMAP.md` for what is decided and what is still open.
 
 Contents:
 
@@ -248,6 +248,8 @@ Pull Requests are welcome!
 ## Releasing
 
 Push a `vX.Y.Z` tag whose version matches `version` in `init.rb` and has an entry in `CHANGELOG.md`. CI runs the tests, builds `redmine_rubylode_glitchtip-X.Y.Z.zip` and publishes the GitHub release with the changelog entry as its notes. To build a release for a tag that already exists, use Actions, release, Run workflow.
+
+The text to paste when listing the plugin on www.redmine.org, and how to read the result of Check for updates, is in [docs/redmine-org-listing.md](docs/redmine-org-listing.md).
 
 ## License
 
