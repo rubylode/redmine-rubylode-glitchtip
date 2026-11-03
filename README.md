@@ -1,5 +1,7 @@
 # Rubylode GlitchTip for Redmine
 
+<p><img src="docs/thumbnail.png" alt="Rubylode GlitchTip plugin" width="160"></p>
+
 TL;DR: this plugin shows the recent [GlitchTip](https://glitchtip.com) errors that may need attention inside
 [Redmine](https://www.redmine.org), as a wiki macro, a page, a My page block and a partial.
 
