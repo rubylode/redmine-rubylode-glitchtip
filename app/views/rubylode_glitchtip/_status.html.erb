@@ -1,0 +1,46 @@
+<%# The errors block. Other plugins can render it: render partial: "rubylode_glitchtip/status"
+    Optional locals: title (replaces the block title), show_title (false hides it), compact (a smaller block
+    without project and culprit), inline_stylesheet (true when the page has already sent its head). It draws nothing for a person the
+    settings do not allow, and a hint for administrators while the plugin is not set up. Everything GlitchTip supplies
+    (titles, culprits, project names) is escaped by ERB; the issue link is built from the saved address and a numeric id.
+    On the Status page the Status plugin passes the locals widget and status; the partial then draws only the table, because
+    that page draws the title and the summary itself. %>
+<% if local_assigns[:widget] %>
+  <%# On the Status page: only the table. The page already shows the title, the state and the summary. %>
+  <% content_for :header_tags, stylesheet_link_tag("rubylode_glitchtip", plugin: "redmine_rubylode_glitchtip") %>
+  <% report = status.data[:report] %>
+  <% if report&.issues&.any? %>
+    <div class="rubylode-glitchtip-errors">
+      <%= render partial: "rubylode_glitchtip/issues", locals: { report: report, settings: RubylodeGlitchtip::Settings.current } %>
+    </div>
+  <% end %>
+<% else %>
+  <% configuration = RubylodeGlitchtip::Settings.current %>
+  <% if configuration.visible_to?(User.current) %>
+    <% stylesheet = stylesheet_link_tag("rubylode_glitchtip", plugin: "redmine_rubylode_glitchtip") %>
+    <%# A full page takes the stylesheet in its head; an AJAX render (the wiki preview) or a block drawn after the head has none, so it carries the link itself. %>
+    <% if request.xhr? || local_assigns[:inline_stylesheet] %><%= stylesheet %><% else %><% content_for :header_tags, stylesheet %><% end %>
+    <% compact = local_assigns.fetch(:compact, false) %>
+    <% block_title = local_assigns[:title].presence || configuration.block_title %>
+    <% show_title = local_assigns.fetch(:show_title, true) %>
+    <% if configuration.configured? %>
+      <% report = RubylodeGlitchtip::ErrorsReport.safe_report(configuration) %>
+      <div class="rubylode-glitchtip-errors<%= " is-compact" if compact %>">
+        <% if show_title %><h3 class="rubylode-glitchtip-errors-title"><%= block_title %></h3><% end %>
+        <p class="rubylode-glitchtip-errors-summary is-<%= report.summary_state.to_s.dasherize %>"><%= report.summary %></p>
+        <% if report.unavailable? && User.current.admin? %>
+          <p class="rubylode-glitchtip-errors-hint"><%= l("rubylode_glitchtip.hints.reason", reason: report.failure_reason) %></p>
+        <% end %>
+        <%= render partial: "rubylode_glitchtip/issues", locals: { report: report, settings: configuration } %>
+      </div>
+    <% elsif User.current.admin? %>
+      <div class="rubylode-glitchtip-errors<%= " is-compact" if compact %>">
+        <% if show_title %><h3 class="rubylode-glitchtip-errors-title"><%= block_title %></h3><% end %>
+        <p class="rubylode-glitchtip-errors-hint">
+          <%= l("rubylode_glitchtip.hints.not_configured") %>
+          <%= link_to l("rubylode_glitchtip.hints.not_configured_link"), plugin_settings_path(RubylodeGlitchtip::PLUGIN_ID.to_s) %>
+        </p>
+      </div>
+    <% end %>
+  <% end %>
+<% end %>

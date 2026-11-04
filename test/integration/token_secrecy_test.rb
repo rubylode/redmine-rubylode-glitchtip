@@ -51,7 +51,7 @@ class RubylodeGlitchtip::TokenSecrecyTest < Redmine::IntegrationTest
 
   test "with the right token the page works and the token is nowhere in the html or the log" do
     log_user("admin", "admin")
-    get "/glitchtip_errors"
+    get "/status/glitchtip"
 
     assert_select ".rubylode-glitchtip-errors-summary.is-needs-attention"
     refute_includes response.body, SAMPLE_TOKEN
@@ -62,7 +62,7 @@ class RubylodeGlitchtip::TokenSecrecyTest < Redmine::IntegrationTest
     ENV[TOKEN_VARIABLE] = "wrong-token-also-secret-55"
 
     log_user("admin", "admin")
-    get "/glitchtip_errors"
+    get "/status/glitchtip"
 
     assert_select ".rubylode-glitchtip-errors-summary", text: "Status unavailable"
     [SAMPLE_TOKEN, "wrong-token-also-secret-55"].each do |token|
@@ -87,7 +87,7 @@ class RubylodeGlitchtip::TokenSecrecyTest < Redmine::IntegrationTest
     configure_plugin("base_url" => @server.base_url, "token_environment_variable" => "SECRET_KEY_BASE_SECRECY_TEST")
 
     log_user("admin", "admin")
-    get "/glitchtip_errors"
+    get "/status/glitchtip"
 
     assert_select ".rubylode-glitchtip-errors-summary", text: "Status unavailable"
     assert_equal 0, @server.request_count
@@ -96,7 +96,7 @@ class RubylodeGlitchtip::TokenSecrecyTest < Redmine::IntegrationTest
 
   test "GlitchTip is asked once for two page loads within the cache window" do
     log_user("jsmith", "jsmith")
-    2.times { get "/glitchtip_errors" }
+    2.times { get "/status/glitchtip" }
 
     assert_equal 1, @server.request_count
   end

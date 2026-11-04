@@ -1,0 +1,8 @@
+<%# Says whether Rubylode Status is installed. The sentences are the same in every Rubylode status plugin. %>
+<p class="rubylode-status-notice">
+  <% if RubylodeGlitchtip::Settings.status_plugin_installed? %>
+    <%= t("rubylode_glitchtip.status_plugin.installed_html", link: link_to(t("rubylode_glitchtip.status_plugin.status_page"), "/status")) %>
+  <% else %>
+    <%= t("rubylode_glitchtip.status_plugin.missing_html", link: link_to("Rubylode Status", "https://github.com/rubylode/redmine-rubylode-status")) %>
+  <% end %>
+</p>

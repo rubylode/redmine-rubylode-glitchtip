@@ -1,0 +1,33 @@
+<%# The table of issues that need attention, and the "and N more" line. Locals: report, settings. %>
+<% if report.issues.any? %>
+<table class="list rubylode-glitchtip-errors-table">
+  <thead>
+    <tr>
+      <th><%= l("rubylode_glitchtip.columns.issue") %></th>
+      <th class="rubylode-glitchtip-errors-project"><%= l("rubylode_glitchtip.columns.project") %></th>
+      <th><%= l("rubylode_glitchtip.columns.level") %></th>
+      <th class="rubylode-glitchtip-errors-events"><%= l("rubylode_glitchtip.columns.events") %></th>
+      <th class="rubylode-glitchtip-errors-last-seen"><%= l("rubylode_glitchtip.columns.last_seen") %></th>
+    </tr>
+  </thead>
+  <tbody>
+    <% report.issues.each do |issue| %>
+      <% level = RubylodeGlitchtip::Settings::LEVELS.include?(issue.level) ? issue.level : "unknown" %>
+      <tr class="rubylode-glitchtip-errors-row is-<%= level %>">
+        <td class="rubylode-glitchtip-errors-title-cell">
+          <%= link_to issue.title.presence || issue.short_id, "#{settings.base_url}/#{ERB::Util.url_encode(settings.organization_slug)}/issues/#{issue.id}",
+                      class: "rubylode-glitchtip-errors-link", title: l("rubylode_glitchtip.open_in_glitchtip"), rel: "noopener noreferrer", target: "_blank" %>
+          <% if issue.culprit.present? %><span class="rubylode-glitchtip-errors-culprit"><%= issue.culprit %></span><% end %>
+        </td>
+        <td class="rubylode-glitchtip-errors-project"><%= issue.project_name %></td>
+        <td class="rubylode-glitchtip-errors-level"><span class="rubylode-glitchtip-errors-dot" aria-hidden="true"></span><%= l("rubylode_glitchtip.levels.#{level}") %></td>
+        <td class="rubylode-glitchtip-errors-events"><%= number_with_delimiter(issue.count) %></td>
+        <td class="rubylode-glitchtip-errors-last-seen" title="<%= format_time(issue.last_seen) %>"><%= l("rubylode_glitchtip.last_seen_ago", time: time_ago_in_words(issue.last_seen)) %></td>
+      </tr>
+    <% end %>
+  </tbody>
+</table>
+<% if report.hidden_count.positive? %>
+  <p class="rubylode-glitchtip-errors-more"><%= l("rubylode_glitchtip.status.more_issues", count: report.hidden_count) %></p>
+<% end %>
+  <% end %>

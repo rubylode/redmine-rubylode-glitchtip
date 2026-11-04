@@ -44,34 +44,34 @@ class RubylodeGlitchtip::WikiMacroTest < Redmine::IntegrationTest
   end
 
   test "the macro draws the errors block inside the wiki page" do
-    get_wiki_page("Right now:\n\n{{glitchtip_errors}}")
+    get_wiki_page("Right now:\n\n{{glitchtip_status}}")
 
     assert_select ".wiki .rubylode-glitchtip-errors-summary", text: "1 issue needs attention, 5 events"
     assert_select ".wiki tr.is-error td.rubylode-glitchtip-errors-title-cell", text: /Boom/
   end
 
   test "the macro takes a title" do
-    get_wiki_page("{{glitchtip_errors(title=Production errors)}}")
+    get_wiki_page("{{glitchtip_status(title=Production errors)}}")
 
     assert_select ".wiki h3.rubylode-glitchtip-errors-title", text: /\AProduction errors/
   end
 
   test "the macro uses the block title setting when it has no title" do
     configure_plugin("block_title" => "Our errors")
-    get_wiki_page("{{glitchtip_errors}}")
+    get_wiki_page("{{glitchtip_status}}")
 
     assert_select ".wiki h3.rubylode-glitchtip-errors-title", text: /\AOur errors/
   end
 
   test "a title with markup in the macro is escaped" do
-    get_wiki_page("{{glitchtip_errors(title=<b>x</b>)}}")
+    get_wiki_page("{{glitchtip_status(title=<b>x</b>)}}")
 
     assert_select ".wiki h3.rubylode-glitchtip-errors-title b", 0
   end
 
   test "the macro draws nothing for a person the settings do not allow" do
     configure_plugin("visibility" => "admins")
-    get_wiki_page("before {{glitchtip_errors}} after")
+    get_wiki_page("before {{glitchtip_status}} after")
 
     assert_select ".rubylode-glitchtip-errors", 0
   end

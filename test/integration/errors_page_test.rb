@@ -42,7 +42,7 @@ class RubylodeGlitchtip::ErrorsPageTest < Redmine::IntegrationTest
                     recent(id: "8", title: "Quiet one", status: "resolved")])
 
     log_user("jsmith", "jsmith")
-    get "/glitchtip_errors"
+    get "/status/glitchtip"
 
     assert_response :success
     assert_select ".rubylode-glitchtip-errors-summary.is-needs-attention", text: "1 issue needs attention, 12 events"
@@ -59,7 +59,7 @@ class RubylodeGlitchtip::ErrorsPageTest < Redmine::IntegrationTest
     publish_issues([recent(id: "7")])
 
     log_user("jsmith", "jsmith")
-    get "/glitchtip_errors"
+    get "/status/glitchtip"
 
     assert_select "a.rubylode-glitchtip-errors-link[target=_blank][rel~=noopener][rel~=noreferrer]"
   end
@@ -68,7 +68,7 @@ class RubylodeGlitchtip::ErrorsPageTest < Redmine::IntegrationTest
     publish_issues([recent(status: "resolved")])
 
     log_user("jsmith", "jsmith")
-    get "/glitchtip_errors"
+    get "/status/glitchtip"
 
     assert_select ".rubylode-glitchtip-errors-summary.is-clear", text: "No errors need attention"
     assert_select ".rubylode-glitchtip-errors-table", 0
@@ -80,7 +80,7 @@ class RubylodeGlitchtip::ErrorsPageTest < Redmine::IntegrationTest
                     recent(id: "3", level: "error", count: 50), recent(id: "4", level: "error", count: 2)])
 
     log_user("jsmith", "jsmith")
-    get "/glitchtip_errors"
+    get "/status/glitchtip"
 
     assert_select "tbody tr:nth-child(1) a[href$='/issues/2']"
     assert_select "tbody tr:nth-child(2) a[href$='/issues/3']"
@@ -94,7 +94,7 @@ class RubylodeGlitchtip::ErrorsPageTest < Redmine::IntegrationTest
     publish_issues([])
 
     log_user("jsmith", "jsmith")
-    get "/glitchtip_errors"
+    get "/status/glitchtip"
 
     assert_select "h2", text: "Production errors"
   end
@@ -104,7 +104,7 @@ class RubylodeGlitchtip::ErrorsPageTest < Redmine::IntegrationTest
     publish_issues([recent(title: hostile, culprit: "<b>bold</b>", project_name: "<i>Shop</i>")])
 
     log_user("admin", "admin")
-    get "/glitchtip_errors"
+    get "/status/glitchtip"
 
     assert_response :success
     refute_includes response.body, "<script>alert(\"owned\")"
@@ -121,7 +121,7 @@ class RubylodeGlitchtip::ErrorsPageTest < Redmine::IntegrationTest
     publish_issues([recent.merge(id: "../../evil"), recent(id: "9")])
 
     log_user("jsmith", "jsmith")
-    get "/glitchtip_errors"
+    get "/status/glitchtip"
 
     assert_response :success
     assert_select "tbody tr", 1
@@ -132,7 +132,7 @@ class RubylodeGlitchtip::ErrorsPageTest < Redmine::IntegrationTest
     publish_failure("GlitchTip answered 503")
 
     log_user("jsmith", "jsmith")
-    get "/glitchtip_errors"
+    get "/status/glitchtip"
 
     assert_response :success
     assert_select ".rubylode-glitchtip-errors-summary.is-unavailable", text: "Status unavailable"
@@ -144,7 +144,7 @@ class RubylodeGlitchtip::ErrorsPageTest < Redmine::IntegrationTest
     publish_failure("GlitchTip answered 503")
 
     log_user("admin", "admin")
-    get "/glitchtip_errors"
+    get "/status/glitchtip"
 
     assert_select ".rubylode-glitchtip-errors-hint", text: /GlitchTip answered 503/
   end
@@ -154,7 +154,7 @@ class RubylodeGlitchtip::ErrorsPageTest < Redmine::IntegrationTest
     configure_plugin("base_url" => "http://127.0.0.1:9")
 
     log_user("jsmith", "jsmith")
-    get "/glitchtip_errors"
+    get "/status/glitchtip"
 
     assert_response :success
     assert_select ".rubylode-glitchtip-errors-summary", text: "Status unavailable"
@@ -164,7 +164,7 @@ class RubylodeGlitchtip::ErrorsPageTest < Redmine::IntegrationTest
     configure_plugin("base_url" => "")
 
     log_user("admin", "admin")
-    get "/glitchtip_errors"
+    get "/status/glitchtip"
     assert_select ".rubylode-glitchtip-errors-hint a[href=?]", "/settings/plugin/redmine_rubylode_glitchtip"
   end
 
@@ -172,7 +172,7 @@ class RubylodeGlitchtip::ErrorsPageTest < Redmine::IntegrationTest
     configure_plugin("base_url" => "")
 
     log_user("jsmith", "jsmith")
-    get "/glitchtip_errors"
+    get "/status/glitchtip"
     assert_response :success
     assert_select ".rubylode-glitchtip-errors", 0
   end
@@ -182,7 +182,7 @@ class RubylodeGlitchtip::ErrorsPageTest < Redmine::IntegrationTest
     publish_issues([recent])
 
     log_user("jsmith", "jsmith")
-    get "/glitchtip_errors"
+    get "/status/glitchtip"
     assert_response :forbidden
   end
 
@@ -191,12 +191,37 @@ class RubylodeGlitchtip::ErrorsPageTest < Redmine::IntegrationTest
     publish_issues([recent])
 
     log_user("admin", "admin")
-    get "/glitchtip_errors"
+    get "/status/glitchtip"
     assert_response :success
   end
 
-  test "an anonymous visitor is sent to sign in" do
+  test "the page says the Status plugin is missing, with a link to it" do
+    publish_issues([])
+    log_user("jsmith", "jsmith")
+    with_status_plugin_installed(false) { get "/status/glitchtip" }
+
+    assert_select "p.rubylode-status-notice", text: "Install Rubylode Status to see this with the other status blocks on one page."
+    assert_select "p.rubylode-status-notice a[href=?]", "https://github.com/rubylode/redmine-rubylode-status", text: "Rubylode Status"
+  end
+
+  test "the page says the block shows on the Status page when the Status plugin is installed" do
+    publish_issues([])
+    log_user("jsmith", "jsmith")
+    with_status_plugin_installed(true) { get "/status/glitchtip" }
+
+    assert_select "p.rubylode-status-notice", text: "Rubylode Status is installed, so this block shows on the Status page."
+    assert_select "p.rubylode-status-notice a[href=?]", "/status", text: "Status page"
+  end
+
+  test "the page before 2.0.0 redirects to the new one" do
     get "/glitchtip_errors"
+
+    assert_response :moved_permanently
+    assert_redirected_to "/status/glitchtip"
+  end
+
+  test "an anonymous visitor is sent to sign in" do
+    get "/status/glitchtip"
 
     assert_redirected_to %r{/login}
   end

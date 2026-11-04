@@ -15,17 +15,18 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-class RubylodeGlitchtipErrorsController < ApplicationController
+# The plugin's own page, at /status/glitchtip. The old /glitchtip_errors redirects here (see config/routes.rb).
+class RubylodeGlitchtipStatusController < ApplicationController
   before_action :require_login
   before_action :require_permission_to_see_errors
 
   def show
-    @configuration = RubylodeGlitchtip::Configuration.current
+    @settings = RubylodeGlitchtip::Settings.current
   end
 
   private
 
   def require_permission_to_see_errors
-    deny_access unless RubylodeGlitchtip::Configuration.current.visible_to?(User.current)
+    deny_access unless RubylodeGlitchtip::Settings.current.visible_to?(User.current)
   end
 end

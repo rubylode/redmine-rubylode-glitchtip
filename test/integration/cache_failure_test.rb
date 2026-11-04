@@ -78,14 +78,14 @@ class RubylodeGlitchtip::CacheFailureTest < Redmine::IntegrationTest
 
   test "My page answers 200 with status unavailable when the report object raises" do
     preference = User.find(2).pref
-    preference.my_page_layout = { "top" => ["rubylode_glitchtip_errors"] }
+    preference.my_page_layout = { "top" => ["rubylode_glitchtip_status"] }
     preference.save!
 
     log_user("jsmith", "jsmith")
     raising_report { get "/my/page" }
 
     assert_response :success
-    assert_select "#block-rubylode_glitchtip_errors #{SUMMARY}.is-unavailable"
+    assert_select "#block-rubylode_glitchtip_status #{SUMMARY}.is-unavailable"
   end
 
   test "the project overview answers 200 with status unavailable when the report object raises" do
@@ -99,7 +99,7 @@ class RubylodeGlitchtip::CacheFailureTest < Redmine::IntegrationTest
   end
 
   test "a page on the path list answers 200 with status unavailable when the report object raises" do
-    configure_plugin("path_patterns" => "/issues")
+    configure_plugin("matching_page_paths" => "/issues")
 
     log_user("jsmith", "jsmith")
     raising_report { get "/issues" }
@@ -110,7 +110,7 @@ class RubylodeGlitchtip::CacheFailureTest < Redmine::IntegrationTest
 
   test "a wiki page with the macro answers 200 with status unavailable when the report object raises" do
     page = WikiPage.new(wiki: Project.find(1).wiki, title: "Errors_#{SecureRandom.hex(3)}")
-    page.content = WikiContent.new(text: "{{glitchtip_errors}}", author: User.find(2))
+    page.content = WikiContent.new(text: "{{glitchtip_status}}", author: User.find(2))
     page.save!
 
     log_user("jsmith", "jsmith")
@@ -122,7 +122,7 @@ class RubylodeGlitchtip::CacheFailureTest < Redmine::IntegrationTest
 
   test "the standalone page answers 200 with status unavailable when the report object raises" do
     log_user("jsmith", "jsmith")
-    raising_report { get "/glitchtip_errors" }
+    raising_report { get "/status/glitchtip" }
 
     assert_response :success
     assert_select "#{SUMMARY}.is-unavailable"
@@ -130,12 +130,12 @@ class RubylodeGlitchtip::CacheFailureTest < Redmine::IntegrationTest
 
   test "an administrator sees the class name of the error in the hint, others do not" do
     log_user("admin", "admin")
-    raising_report { get "/glitchtip_errors" }
+    raising_report { get "/status/glitchtip" }
     assert_select ".rubylode-glitchtip-errors-hint", text: /IOError/
 
     post "/logout"
     log_user("jsmith", "jsmith")
-    raising_report { get "/glitchtip_errors" }
+    raising_report { get "/status/glitchtip" }
     assert_select ".rubylode-glitchtip-errors-hint", 0
   end
 end

@@ -17,15 +17,15 @@
 
 module RubylodeGlitchtip
   # Decides whether the block is drawn at the end of a page, from the path patterns in the settings.
-  #   - A pattern is a path such as /issues or /projects/*/issues. A star matches any run of characters, slashes included;
-  #     everything else is literal.
+  #   - A pattern is a path such as /issues or /projects/*/issues. A star matches anything inside one path segment, two
+  #     stars match anything, slashes included; everything else is literal.
   #   - The query string and the fragment are ignored, in the pattern and in the path, and so is a trailing slash.
   #   - Settings, administration, sign-in and account pages never match unless a pattern names them: a pattern has to
   #     begin with the page's own path (/admin/*, /login), so /* or /*/edit do not reach them.
   #   - The block's own page never matches, so it is not drawn twice.
   class PathMatcher
     PROTECTED_PATHS = %w[/settings /admin /login /logout /account].freeze
-    OWN_PAGE = "/glitchtip_errors".freeze
+    OWN_PAGES = %w[/status/glitchtip /glitchtip_errors].freeze
 
     def self.patterns_from(text)
       text.to_s.lines.map(&:strip).reject(&:empty?)
@@ -42,7 +42,7 @@ module RubylodeGlitchtip
 
     def match?(path)
       path = self.class.normalize(path)
-      return false if path == OWN_PAGE || @patterns.empty?
+      return false if OWN_PAGES.include?(path) || @patterns.empty?
 
       protected_path = PROTECTED_PATHS.find { |prefix| path == prefix || path.start_with?("#{prefix}/") }
       @patterns.any? do |pattern|
@@ -53,7 +53,10 @@ module RubylodeGlitchtip
     private
 
     def regular_expression_for(pattern)
-      Regexp.new("\\A#{pattern.split('*', -1).map { |part| Regexp.escape(part) }.join('.*')}\\z")
+      body = pattern.split("**", -1).map do |part|
+        part.split("*", -1).map { |literal| Regexp.escape(literal) }.join("[^/]*")
+      end.join(".*")
+      Regexp.new("\\A#{body}\\z")
     end
   end
 end

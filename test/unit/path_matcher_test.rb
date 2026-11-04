@@ -28,12 +28,23 @@ class RubylodeGlitchtip::PathMatcherTest < ActiveSupport::TestCase
     refute matcher("/issues").match?("/projects")
   end
 
-  test "a star matches any run of characters, including slashes" do
+  test "a star matches anything inside one path segment" do
     assert matcher("/projects/*/issues").match?("/projects/ecookbook/issues")
-    assert matcher("/projects/*/issues").match?("/projects/a/b/issues")
+    refute matcher("/projects/*/issues").match?("/projects/a/b/issues")
     refute matcher("/projects/*/issues").match?("/projects/ecookbook/wiki")
     assert matcher("/issues/*").match?("/issues/12")
+    refute matcher("/issues/*").match?("/issues/12/edit")
+    assert matcher("/issue*").match?("/issues")
     assert matcher("/*").match?("/wiki")
+    refute matcher("/*").match?("/wiki/Page")
+  end
+
+  test "two stars match anything, slashes included" do
+    assert matcher("/projects/**/issues").match?("/projects/a/b/issues")
+    assert matcher("/projects/**/issues").match?("/projects/ecookbook/issues")
+    assert matcher("/wiki/**").match?("/wiki/Page/History")
+    assert matcher("/**").match?("/a/b/c")
+    refute matcher("/projects/**/issues").match?("/projects/ecookbook/wiki")
   end
 
   test "regular expression characters in a pattern are plain characters" do
@@ -61,7 +72,7 @@ class RubylodeGlitchtip::PathMatcherTest < ActiveSupport::TestCase
   end
 
   test "settings, admin, login and account pages never match a wildcard" do
-    wildcard = matcher("/*", "/*/edit", "*")
+    wildcard = matcher("/*", "/*/edit", "/**", "**")
 
     %w[/settings /settings/plugin/redmine_rubylode_glitchtip /admin /admin/plugins /login /logout /account/register
        /account/lost_password].each do |path|
@@ -73,13 +84,13 @@ class RubylodeGlitchtip::PathMatcherTest < ActiveSupport::TestCase
   test "a protected page matches when a pattern names it explicitly" do
     assert matcher("/login").match?("/login")
     assert matcher("/admin/*").match?("/admin/plugins")
-    assert matcher("/settings*").match?("/settings/plugin/x")
+    assert matcher("/settings/**").match?("/settings/plugin/x")
     refute matcher("/adm*").match?("/admin"), "a shorter prefix with a star is not an explicit listing"
   end
 
   test "the block's own page never matches, so it is not drawn twice" do
-    refute matcher("/*").match?("/glitchtip_errors")
-    refute matcher("/glitchtip_errors").match?("/glitchtip_errors")
+    refute matcher("/*").match?("/status/glitchtip")
+    refute matcher("/status/glitchtip").match?("/status/glitchtip")
   end
 
   test "no patterns match nothing" do

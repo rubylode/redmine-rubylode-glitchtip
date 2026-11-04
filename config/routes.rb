@@ -15,4 +15,6 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-get "glitchtip_errors", to: "rubylode_glitchtip_errors#show", as: :rubylode_glitchtip_errors
+get "status/glitchtip", to: "rubylode_glitchtip_status#show", as: :rubylode_glitchtip_status, format: false
+# The page before 2.0.0, redirected for one release.
+get "glitchtip_errors", to: redirect("/status/glitchtip", status: 301), as: :rubylode_glitchtip_errors

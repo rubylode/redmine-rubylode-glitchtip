@@ -1,4 +1,2 @@
-<%# "Show on My page" in the settings: when it is off, the block stays in the list but draws nothing. %>
-<% if RubylodeGlitchtip::Configuration.current.show_on_my_page? %>
-  <%= render partial: "rubylode_glitchtip/errors" %>
-<% end %>
+<%# The block's name before 2.0.0. Kept for one release so a saved My page layout keeps drawing it. %>
+<%= render partial: "rubylode_glitchtip/status" %>

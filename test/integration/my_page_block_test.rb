@@ -35,19 +35,19 @@ class RubylodeGlitchtip::MyPageBlockTest < Redmine::IntegrationTest
   end
 
   test "the block is in Redmine's list of My page blocks" do
-    assert Redmine::MyPage.blocks.key?("rubylode_glitchtip_errors")
-    assert_includes Redmine::MyPage.block_options.map(&:last), "rubylode_glitchtip_errors"
+    assert Redmine::MyPage.blocks.key?("rubylode_glitchtip_status")
+    assert_includes Redmine::MyPage.block_options.map(&:last), "rubylode_glitchtip_status"
   end
 
   test "a person who added the block sees the errors on My page" do
     preference = User.find(2).pref
-    preference.my_page_layout = { "top" => ["rubylode_glitchtip_errors"] }
+    preference.my_page_layout = { "top" => ["rubylode_glitchtip_status"] }
     preference.save!
 
     log_user("jsmith", "jsmith")
     get "/my/page"
 
     assert_response :success
-    assert_select "#block-rubylode_glitchtip_errors .rubylode-glitchtip-errors-summary", text: "1 issue needs attention, 5 events"
+    assert_select "#block-rubylode_glitchtip_status .rubylode-glitchtip-errors-summary", text: "1 issue needs attention, 5 events"
   end
 end
