@@ -8,7 +8,7 @@ TL;DR: this plugin shows the recent [GlitchTip](https://glitchtip.com) errors th
 Each one is a summary line and a table with the project, level, event count, last seen and a link to the issue in GlitchTip.
 The token stays in an environment variable and the block only reads.
 
-Status: version 1.1.0, needs Redmine 5.0 or newer. `docs/roadmap/ROADMAP.md` lists what is decided and what is still open.
+Status: version 1.1.1, needs Redmine 5.1 or newer. `docs/roadmap/ROADMAP.md` lists what is decided and what is still open.
 
 Contents:
 
@@ -147,7 +147,7 @@ shows it while "Show in the top menu" is ticked and the person may see the block
 
 ## Installation
 
-Redmine 5.0 or newer. The folder must be named `redmine_rubylode_glitchtip`, the same as the plugin id.
+Redmine 5.1 or newer. The folder must be named `redmine_rubylode_glitchtip`, the same as the plugin id.
 
 1. Put the plugin in your Redmine's `plugins` folder:
 
@@ -273,4 +273,4 @@ GNU General Public License, version 2 or (at your option) any later version, the
 
 Copyright (C) 2026  Nick Gorbikoff
 
-No warranty, as the GPL says. The plugin sends an API token to the GlitchTip address you configure, so keep the token read-only and try the plugin on a copy of your tracker first. I tested it in CI with the Rubylode plugins' own test suites on Redmine 7.0, 6.1, 6.0, 5.1 and 5.0, against a fake GlitchTip built from its published API description, not against a running GlitchTip.
+No warranty, as the GPL says. The plugin sends an API token to the GlitchTip address you configure, so keep the token read-only and try the plugin on a copy of your tracker first. I tested it in CI with the Rubylode plugins' own test suites on Redmine 7.0, 6.1, 6.0 and 5.1, against a fake GlitchTip built from its published API description, not against a running GlitchTip.
