@@ -18,4 +18,13 @@ inside = <<~SH
   #{runner}
 SH
 
-exec "docker", "compose", "--profile", "test", "run", "--rm", "test", "sh", "-c", inside
+# The Status plugin, when its checkout sits next to this one, is mounted read-only beside this plugin, so the tests also
+# run against the real registry. CI and a machine without that checkout run the tests without it.
+status_checkout = File.expand_path("../redmine-rubylode-status", Dir.pwd)
+mount = if File.directory?(status_checkout) && ENV["WITHOUT_STATUS_PLUGIN"].to_s.empty?
+  ["--volume", "#{status_checkout}:/usr/src/redmine/plugins/redmine_rubylode_status:ro"]
+else
+  []
+end
+
+exec "docker", "compose", "--profile", "test", "run", "--rm", *mount, "test", "sh", "-c", inside
