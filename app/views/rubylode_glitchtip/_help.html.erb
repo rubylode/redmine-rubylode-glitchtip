@@ -7,8 +7,8 @@
 
   <h4><%= l("#{scope}.macro_heading") %></h4>
   <p><%= l("#{scope}.macro_text") %></p>
-  <pre><code>{{glitchtip_errors}}
-{{glitchtip_errors(title=Production errors)}}</code></pre>
+  <pre><code>{{glitchtip_status}}
+{{glitchtip_status(title=Production errors)}}</code></pre>
   <p><%= l("#{scope}.macro_title_text") %></p>
 
   <h4><%= l("#{scope}.my_page_heading") %></h4>
@@ -18,12 +18,17 @@
   <p><%= l("#{scope}.paths_text") %></p>
   <pre><code>/issues
 /projects/*/issues
-/projects/*/wiki/*</code></pre>
+/projects/*/wiki/**</code></pre>
 
   <h4><%= l("#{scope}.partial_heading") %></h4>
   <p><%= l("#{scope}.partial_text") %></p>
-  <pre><code>&lt;%= render partial: "rubylode_glitchtip/errors" %&gt;
-&lt;%= render partial: "rubylode_glitchtip/errors", locals: { title: "Production errors", compact: true } %&gt;</code></pre>
+  <ul>
+    <% %w[title show_title compact inline_stylesheet].each do |name| %>
+      <li><%= l("#{scope}.partial_local_#{name}") %></li>
+    <% end %>
+  </ul>
+  <pre><code>&lt;%= render partial: "rubylode_glitchtip/status" %&gt;
+&lt;%= render partial: "rubylode_glitchtip/status", locals: { title: "Production errors", compact: true } %&gt;</code></pre>
 
   <h4><%= l("#{scope}.page_heading") %></h4>
   <p><%= l("#{scope}.page_text") %></p>

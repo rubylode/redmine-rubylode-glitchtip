@@ -28,16 +28,16 @@ module RubylodeGlitchtip
     PAGE_SIZE = 100
     MAX_PAGES = 5
 
-    def self.from_configuration(configuration, now: Time.current)
-      new(base_url: configuration.base_url,
-          organization_slug: configuration.organization_slug,
-          token: configuration.token,
-          token_variable_allowed: configuration.token_variable_allowed?,
-          allowed_hosts: configuration.allowed_hosts,
-          allow_plain_http: configuration.allow_plain_http?,
-          timeout_seconds: configuration.timeout_seconds,
-          lookback_hours: configuration.lookback_hours,
-          token_environment_variable: configuration.token_environment_variable,
+    def self.from_settings(settings, now: Time.current)
+      new(base_url: settings.base_url,
+          organization_slug: settings.organization_slug,
+          token: settings.token,
+          token_variable_allowed: settings.token_variable_allowed?,
+          allowed_hosts: settings.allowed_hosts,
+          allow_plain_http: settings.allow_plain_http?,
+          timeout_seconds: settings.timeout_seconds,
+          lookback_hours: settings.look_back_hours,
+          token_environment_variable: settings.token_environment_variable,
           now: now)
     end
 
@@ -93,7 +93,7 @@ module RubylodeGlitchtip
       uri = URI.parse(url)
       raise Unavailable, I18n.t("rubylode_glitchtip.errors.host_not_allowed") unless @allowed_hosts.include?(uri.host.to_s.downcase)
 
-      secure = uri.scheme == "https" || (uri.scheme == "http" && (Configuration.loopback_host?(uri.host) || @allow_plain_http))
+      secure = uri.scheme == "https" || (uri.scheme == "http" && (Settings.loopback_host?(uri.host) || @allow_plain_http))
       raise Unavailable, I18n.t("rubylode_glitchtip.errors.transport_not_allowed") unless secure
     end
 

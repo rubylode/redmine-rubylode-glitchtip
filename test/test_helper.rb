@@ -21,7 +21,7 @@ require "stringio"
 require_relative "support/fake_glitchtip_server"
 
 module RubylodeGlitchtipTestHelpers
-  PLUGIN_ID = RedmineRubylodeGlitchtip::PLUGIN_ID
+  PLUGIN_ID = RubylodeGlitchtip::PLUGIN_ID
   BASE_URL = "https://glitchtip.example.com".freeze
   ORGANIZATION = "example-org".freeze
   # The moment the unit tests treat as "now", so the look-back window is the same on every run.
@@ -39,11 +39,19 @@ module RubylodeGlitchtipTestHelpers
     RubylodeGlitchtip::Issue.new(**issue_hash(overrides))
   end
 
+  # Giving paths switches "Pages matching these paths" on, unless the test says otherwise.
   def configure_plugin(overrides = {})
-    settings = RedmineRubylodeGlitchtip::Defaults::SETTINGS.merge(
+    overrides = overrides.transform_keys(&:to_s)
+    overrides = { "show_on_matching_pages" => "1" }.merge(overrides) if overrides["matching_page_paths"].present?
+    settings = RubylodeGlitchtip::Settings::DEFAULTS.merge(
       "base_url" => BASE_URL, "organization_slug" => ORGANIZATION
-    ).merge(overrides.transform_keys(&:to_s))
+    ).merge(overrides)
     Setting.send(:"plugin_#{PLUGIN_ID}=", settings)
+  end
+
+  # Runs the block with the Status plugin counted as installed or not, whatever is mounted next to this plugin.
+  def with_status_plugin_installed(installed, &block)
+    replacing_method(RubylodeGlitchtip::Settings, :status_plugin_installed?, -> { installed }, &block)
   end
 
   def use_memory_cache

@@ -34,14 +34,14 @@ class RubylodeGlitchtip::GlitchtipClientHttpTest < ActiveSupport::TestCase
   end
 
   def configuration(overrides = {})
-    RubylodeGlitchtip::Configuration.new(
+    RubylodeGlitchtip::Settings.new(
       { "base_url" => @server.base_url, "organization_slug" => "demo-org", "token_environment_variable" => "GLITCHTIP_HTTP_TEST_TOKEN",
         "timeout_seconds" => "2" }.merge(overrides)
     )
   end
 
   def fetch(configuration)
-    RubylodeGlitchtip::GlitchtipClient.from_configuration(configuration).call
+    RubylodeGlitchtip::GlitchtipClient.from_settings(configuration).call
   end
 
   test "with the right token the issues come back, and the token went in a bearer header" do

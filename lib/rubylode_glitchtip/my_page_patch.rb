@@ -15,23 +15,17 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
+module RubylodeGlitchtip
+  # "My page" in the settings adds the block to the default My page, the one people get until they arrange their own.
+  # A layout a person already saved is never touched, and the block stays in everyone's block list either way.
+  module MyPagePatch
+    def default_layout
+      layout = super
+      return layout unless RubylodeGlitchtip::Settings.current.show_on_my_page?
 
-module RedmineRubylodeGlitchtip
-  # Redmine saves plugin settings without asking the plugin. This checks ours first: when something is wrong the form is
-  # shown again with what the person typed and a list of the problems, and nothing is saved.
-  module SettingsControllerPatch
-    def plugin
-      return super unless request.post? && params[:id].to_s == PLUGIN_ID.to_s
-
-      submitted = params[:settings] ? params[:settings].permit!.to_h : {}
-      errors = RubylodeGlitchtip::SettingsValidator.errors_for(submitted)
-      return super if errors.empty?
-
-      @plugin = Redmine::Plugin.find(params[:id])
-      @partial = @plugin.settings[:partial]
-      @settings = submitted
-      @validation_errors = errors
-      render "settings/plugin", status: :unprocessable_entity
+      layout.merge("top" => Array(layout["top"]) + [BLOCK])
     end
+
+    BLOCK = "rubylode_glitchtip_status".freeze
   end
 end

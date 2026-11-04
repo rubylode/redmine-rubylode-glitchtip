@@ -15,9 +15,9 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-module RedmineRubylodeGlitchtip
+module RubylodeGlitchtip
   # Puts the errors block where the settings ask for it: Redmine's welcome (Home) page, a project's Overview page, and
-  # the end of any page whose path matches the path patterns. The block is the same partial as everywhere else, so
+  # the end of any page whose path matches the paths in the settings. The block is the same partial as everywhere else, so
   # permission, caching and the "status unavailable" fallback are the same too.
   class Hooks < Redmine::Hook::ViewListener
     def view_welcome_index_left(context)
@@ -43,26 +43,26 @@ module RedmineRubylodeGlitchtip
       request = context[:request]
       return "" unless request&.get? && !request.xhr?
 
-      configuration = RubylodeGlitchtip::Configuration.current
-      return "" unless RubylodeGlitchtip::PathMatcher.new(configuration.path_patterns).match?(request.path)
+      settings = RubylodeGlitchtip::Settings.current
+      return "" unless settings.show_on_matching_pages? && RubylodeGlitchtip::PathMatcher.new(settings.matching_page_paths).match?(request.path)
 
-      context[:hook_caller].render(partial: "rubylode_glitchtip/errors", locals: { compact: true, inline_stylesheet: true })
+      context[:hook_caller].render(partial: "rubylode_glitchtip/status", locals: { compact: true, inline_stylesheet: true })
     end
 
     private
 
     def render_on_welcome_page(context, column)
-      configuration = RubylodeGlitchtip::Configuration.current
-      return "" unless configuration.show_on_welcome_page? && configuration.welcome_page_column == column
+      settings = RubylodeGlitchtip::Settings.current
+      return "" unless settings.show_on_welcome_page? && settings.welcome_page_column == column
 
-      context[:hook_caller].render(partial: "rubylode_glitchtip/errors")
+      context[:hook_caller].render(partial: "rubylode_glitchtip/status")
     end
 
     def render_on_project_overview(context, column)
-      configuration = RubylodeGlitchtip::Configuration.current
-      return "" unless configuration.show_on_project_overview? && configuration.project_overview_column == column
+      settings = RubylodeGlitchtip::Settings.current
+      return "" unless settings.show_on_project_overview? && settings.project_overview_column == column
 
-      context[:hook_caller].render(partial: "rubylode_glitchtip/errors")
+      context[:hook_caller].render(partial: "rubylode_glitchtip/status")
     end
   end
 end

@@ -16,9 +16,39 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 module RubylodeGlitchtip
+  PLUGIN_ID = :redmine_rubylode_glitchtip
+
   # The plugin's settings, read with their defaults and clamped to sensible values. The token is not one of them:
   # only the NAME of the environment variable that holds it is a setting.
-  class Configuration
+  class Settings
+    # What a fresh install starts with. Everything here is a plugin setting except the token, which is only ever read
+    # from the environment variable named by "token_environment_variable".
+    DEFAULTS = {
+      "base_url" => "",
+      "organization_slug" => "",
+      "token_environment_variable" => "GLITCHTIP_API_TOKEN",
+      "allowed_hosts" => "",
+      "allow_plain_http" => "0",
+      "look_back_hours" => "24",
+      "minimum_event_count" => "1",
+      "levels" => %w[error fatal].freeze,
+      "maximum_rows" => "10",
+      "project_allow_list" => "",
+      "cache_seconds" => "60",
+      "failure_cache_seconds" => "30",
+      "timeout_seconds" => "2",
+      "block_title" => "Errors",
+      "visibility" => "logged_in",
+      "show_on_welcome_page" => "0",
+      "welcome_page_column" => "right",
+      "show_on_my_page" => "0",
+      "show_on_project_overview" => "0",
+      "project_overview_column" => "right",
+      "show_on_matching_pages" => "0",
+      "matching_page_paths" => "",
+      "show_in_top_menu" => "0"
+    }.freeze
+
     COLUMNS = %w[left right].freeze
     VISIBILITIES = %w[logged_in admins].freeze
     LEVELS = %w[fatal error warning info debug].freeze
@@ -29,16 +59,16 @@ module RubylodeGlitchtip
     SLUG_PATTERN = /\A[A-Za-z0-9_-]+\z/
     # number setting => [smallest allowed value, largest allowed value or nil]
     NUMBER_LIMITS = {
-      "lookback_hours" => [1, nil], "minimum_event_count" => [1, nil], "maximum_rows" => [1, 100],
+      "look_back_hours" => [1, nil], "minimum_event_count" => [1, nil], "maximum_rows" => [1, 100],
       "cache_seconds" => [0, nil], "failure_cache_seconds" => [0, nil], "timeout_seconds" => [1, nil]
     }.freeze
 
     def self.current
-      new(Setting.send(:"plugin_#{RedmineRubylodeGlitchtip::PLUGIN_ID}"))
+      new(Setting.send(:"plugin_#{PLUGIN_ID}"))
     end
 
     def initialize(raw_settings = {})
-      @settings = RedmineRubylodeGlitchtip::Defaults::SETTINGS.merge((raw_settings || {}).to_h.stringify_keys.compact)
+      @settings = DEFAULTS.merge((raw_settings || {}).to_h.stringify_keys.compact)
     end
 
     def base_url
@@ -52,7 +82,7 @@ module RubylodeGlitchtip
     # The configured name as typed; see token_variable_allowed? before trusting it.
     def token_environment_variable
       name = @settings["token_environment_variable"].to_s.strip
-      name.empty? ? RedmineRubylodeGlitchtip::Defaults::SETTINGS["token_environment_variable"] : name
+      name.empty? ? DEFAULTS["token_environment_variable"] : name
     end
 
     def token_variable_allowed?
@@ -94,7 +124,7 @@ module RubylodeGlitchtip
       host == "localhost" || host == "::1" || host.match?(/\A127(\.\d{1,3}){3}\z/)
     end
 
-    def lookback_hours = whole_number("lookback_hours")
+    def look_back_hours = whole_number("look_back_hours")
     def minimum_event_count = whole_number("minimum_event_count")
     def maximum_rows = whole_number("maximum_rows")
     def cache_seconds = whole_number("cache_seconds")
@@ -103,7 +133,7 @@ module RubylodeGlitchtip
 
     def levels
       chosen = self.class.list_from(@settings["levels"]).map(&:downcase) & LEVELS
-      chosen.empty? ? RedmineRubylodeGlitchtip::Defaults::SETTINGS["levels"].dup : chosen
+      chosen.empty? ? DEFAULTS["levels"].dup : chosen
     end
 
     def project_allow_list
@@ -112,7 +142,7 @@ module RubylodeGlitchtip
 
     def block_title
       title = @settings["block_title"].to_s.strip
-      title.empty? ? RedmineRubylodeGlitchtip::Defaults::SETTINGS["block_title"] : title
+      title.empty? ? DEFAULTS["block_title"] : title
     end
 
     def visibility
@@ -120,6 +150,7 @@ module RubylodeGlitchtip
     end
 
     def show_on_my_page? = flag?("show_on_my_page")
+    def show_on_matching_pages? = flag?("show_on_matching_pages")
     def show_on_welcome_page? = flag?("show_on_welcome_page")
     def show_on_project_overview? = flag?("show_on_project_overview")
     def show_in_top_menu? = flag?("show_in_top_menu")
@@ -127,9 +158,14 @@ module RubylodeGlitchtip
     def welcome_page_column = column("welcome_page_column")
     def project_overview_column = column("project_overview_column")
 
-    # The path patterns that draw the block at the end of a page, one per line in the settings.
-    def path_patterns
-      PathMatcher.patterns_from(@settings["path_patterns"])
+    # The paths that draw the block at the end of a page, one per line in the settings.
+    def matching_page_paths
+      PathMatcher.patterns_from(@settings["matching_page_paths"])
+    end
+
+    # True while the Status plugin is installed. The block is then on its page, so this plugin drops its own top menu item.
+    def self.status_plugin_installed?
+      defined?(::RubylodeStatus::Registry) ? true : false
     end
 
     def visible_to?(user)
@@ -164,7 +200,7 @@ module RubylodeGlitchtip
       value = [value, minimum].max
       maximum ? [value, maximum].min : value
     rescue ArgumentError
-      Integer(RedmineRubylodeGlitchtip::Defaults::SETTINGS[key], 10)
+      Integer(DEFAULTS[key], 10)
     end
   end
 end

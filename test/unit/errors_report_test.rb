@@ -160,7 +160,7 @@ class RubylodeGlitchtip::ErrorsReportTest < ActiveSupport::TestCase
   end
 
   test "safe_report answers status unavailable and logs the class when building the report raises" do
-    configuration = RubylodeGlitchtip::Configuration.current
+    configuration = RubylodeGlitchtip::Settings.current
     report = nil
     log = captured_log do
       replacing_method(RubylodeGlitchtip::ErrorsReport, :current, ->(*) { raise ArgumentError, "boom" }) do

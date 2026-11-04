@@ -27,13 +27,13 @@ class RubylodeGlitchtip::PluginSettingsTest < Redmine::IntegrationTest
   GOOD_SETTINGS = {
     "base_url" => "https://glitchtip.example.com", "organization_slug" => "example-org",
     "token_environment_variable" => "GLITCHTIP_MY_TOKEN", "allowed_hosts" => "", "allow_plain_http" => "0",
-    "lookback_hours" => "12", "minimum_event_count" => "2", "levels" => ["", "fatal", "error", "warning"],
+    "look_back_hours" => "12", "minimum_event_count" => "2", "levels" => ["", "fatal", "error", "warning"],
     "maximum_rows" => "5", "project_allow_list" => "web, api", "cache_seconds" => "120", "failure_cache_seconds" => "15",
     "timeout_seconds" => "3", "block_title" => "Our errors", "visibility" => "admins"
   }.freeze
 
   setup do
-    Setting.send(:"plugin_#{PLUGIN_ID}=", RedmineRubylodeGlitchtip::Defaults::SETTINGS.dup)
+    Setting.send(:"plugin_#{PLUGIN_ID}=", RubylodeGlitchtip::Settings::DEFAULTS.dup)
   end
 
   def saved
@@ -45,7 +45,7 @@ class RubylodeGlitchtip::PluginSettingsTest < Redmine::IntegrationTest
     get SETTINGS_PATH
 
     assert_response :success
-    %w[base_url organization_slug token_environment_variable allowed_hosts allow_plain_http lookback_hours minimum_event_count
+    %w[base_url organization_slug token_environment_variable allowed_hosts allow_plain_http look_back_hours minimum_event_count
        maximum_rows project_allow_list block_title visibility cache_seconds failure_cache_seconds timeout_seconds].each do |field|
       assert_select "[name=?]", "settings[#{field}]"
     end
@@ -60,11 +60,11 @@ class RubylodeGlitchtip::PluginSettingsTest < Redmine::IntegrationTest
     post SETTINGS_PATH, params: { settings: GOOD_SETTINGS }
 
     assert_redirected_to SETTINGS_PATH
-    configuration = RubylodeGlitchtip::Configuration.current
+    configuration = RubylodeGlitchtip::Settings.current
     assert_equal "https://glitchtip.example.com", configuration.base_url
     assert_equal "GLITCHTIP_MY_TOKEN", configuration.token_environment_variable
     assert_equal %w[fatal error warning], configuration.levels
-    assert_equal 12, configuration.lookback_hours
+    assert_equal 12, configuration.look_back_hours
     assert_equal %w[web api], configuration.project_allow_list
     assert_equal "admins", configuration.visibility
   end
@@ -97,7 +97,7 @@ class RubylodeGlitchtip::PluginSettingsTest < Redmine::IntegrationTest
 
     post SETTINGS_PATH, params: { settings: GOOD_SETTINGS.merge("base_url" => "http://glitchtip.internal", "allow_plain_http" => "1") }
     assert_redirected_to SETTINGS_PATH
-    assert RubylodeGlitchtip::Configuration.current.transport_allowed?
+    assert RubylodeGlitchtip::Settings.current.transport_allowed?
   end
 
   test "someone who is not an administrator cannot open or save the settings" do

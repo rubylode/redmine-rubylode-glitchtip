@@ -20,7 +20,7 @@ require_relative "../test_helper"
 class RubylodeGlitchtip::SettingsValidatorTest < ActiveSupport::TestCase
   GOOD = {
     "base_url" => "https://glitchtip.example.com", "allowed_hosts" => "", "allow_plain_http" => "0", "organization_slug" => "example-org",
-    "token_environment_variable" => "GLITCHTIP_MY_TOKEN", "lookback_hours" => "12", "minimum_event_count" => "2",
+    "token_environment_variable" => "GLITCHTIP_MY_TOKEN", "look_back_hours" => "12", "minimum_event_count" => "2",
     "levels" => %w[error fatal], "maximum_rows" => "5", "project_allow_list" => "web, api",
     "cache_seconds" => "0", "failure_cache_seconds" => "10", "timeout_seconds" => "3",
     "block_title" => "Errors", "visibility" => "admins"
@@ -76,7 +76,7 @@ class RubylodeGlitchtip::SettingsValidatorTest < ActiveSupport::TestCase
   end
 
   test "numbers must be whole and at least their minimum" do
-    assert_equal 1, errors("lookback_hours" => "0").size
+    assert_equal 1, errors("look_back_hours" => "0").size
     assert_equal 1, errors("maximum_rows" => "many").size
     assert_equal 1, errors("maximum_rows" => "101").size
     assert_equal 1, errors("timeout_seconds" => "0").size
@@ -99,22 +99,22 @@ class RubylodeGlitchtip::SettingsValidatorTest < ActiveSupport::TestCase
   end
 
   test "good path patterns are accepted" do
-    assert_empty errors("path_patterns" => "/issues\n/projects/*/issues\n\n/wiki/*")
+    assert_empty errors("matching_page_paths" => "/issues\n/projects/*/issues\n\n/wiki/*")
   end
 
   test "a path pattern must start with a slash and carry no scheme, host, spaces or control characters" do
     ["issues", "https://example.com/issues", "//example.com/issues", "/issues /x", "/is\tsues", "example.com/issues"].each do |pattern|
-      assert_equal 1, errors("path_patterns" => pattern).size, pattern.inspect
+      assert_equal 1, errors("matching_page_paths" => pattern).size, pattern.inspect
     end
   end
 
   test "a path pattern has a maximum length and the list a maximum size" do
-    assert_equal 1, errors("path_patterns" => "/#{'a' * 200}").size
-    assert_equal 1, errors("path_patterns" => (1..21).map { |number| "/page#{number}" }.join("\n")).size
+    assert_equal 1, errors("matching_page_paths" => "/#{'a' * 200}").size
+    assert_equal 1, errors("matching_page_paths" => (1..21).map { |number| "/page#{number}" }.join("\n")).size
   end
 
   test "each bad path line is reported with its line number" do
-    messages = errors("path_patterns" => "/issues\nbad\n/ok\nalso bad")
+    messages = errors("matching_page_paths" => "/issues\nbad\n/ok\nalso bad")
 
     assert_equal 2, messages.size
     assert_match(/line 2/, messages.first)

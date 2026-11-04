@@ -17,15 +17,15 @@
 
 require_relative "../test_helper"
 
-class RubylodeGlitchtip::ConfigurationTest < ActiveSupport::TestCase
+class RubylodeGlitchtip::SettingsTest < ActiveSupport::TestCase
   def configuration(settings = {})
-    RubylodeGlitchtip::Configuration.new(settings)
+    RubylodeGlitchtip::Settings.new(settings)
   end
 
   test "an empty configuration has the documented defaults" do
     result = configuration
 
-    assert_equal 24, result.lookback_hours
+    assert_equal 24, result.look_back_hours
     assert_equal 1, result.minimum_event_count
     assert_equal %w[error fatal], result.levels
     assert_equal 10, result.maximum_rows
@@ -38,30 +38,42 @@ class RubylodeGlitchtip::ConfigurationTest < ActiveSupport::TestCase
     refute result.configured?
   end
 
-  test "the placements default to My page only, with the columns on the right" do
+  test "no placement is on by default, with the columns on the right" do
     result = configuration
 
-    assert result.show_on_my_page?
+    refute result.show_on_my_page?
     refute result.show_on_welcome_page?
     assert_equal "right", result.welcome_page_column
     refute result.show_on_project_overview?
     assert_equal "right", result.project_overview_column
-    assert_empty result.path_patterns
+    refute result.show_on_matching_pages?
+    assert_empty result.matching_page_paths
     refute result.show_in_top_menu?
   end
 
   test "placements are switched on with 1 and columns fall back to the right" do
-    result = configuration("show_on_my_page" => "0", "show_on_welcome_page" => "1", "welcome_page_column" => "left",
+    result = configuration("show_on_my_page" => "1", "show_on_welcome_page" => "1", "welcome_page_column" => "left",
                            "show_on_project_overview" => "1", "project_overview_column" => "middle",
-                           "path_patterns" => "/issues\n/projects/*/issues", "show_in_top_menu" => "1")
+                           "show_on_matching_pages" => "1", "matching_page_paths" => "/issues\n/projects/*/issues", "show_in_top_menu" => "1")
 
-    refute result.show_on_my_page?
+    assert result.show_on_my_page?
     assert result.show_on_welcome_page?
     assert_equal "left", result.welcome_page_column
     assert result.show_on_project_overview?
     assert_equal "right", result.project_overview_column
-    assert_equal ["/issues", "/projects/*/issues"], result.path_patterns
+    assert result.show_on_matching_pages?
+    assert_equal ["/issues", "/projects/*/issues"], result.matching_page_paths
     assert result.show_in_top_menu?
+  end
+
+  test "the Status plugin counts as installed only while its registry exists" do
+    registry_defined = defined?(::RubylodeStatus::Registry) ? true : false
+
+    assert_equal registry_defined, RubylodeGlitchtip::Settings.status_plugin_installed?
+  end
+
+  test "the block title defaults to Errors" do
+    assert_equal "Errors", configuration.block_title
   end
 
   test "it is configured once it has a web address and an organization" do
@@ -75,9 +87,9 @@ class RubylodeGlitchtip::ConfigurationTest < ActiveSupport::TestCase
   end
 
   test "numbers that are not whole numbers fall back to the default and small ones are raised to the minimum" do
-    result = configuration("lookback_hours" => "soon", "maximum_rows" => "0", "timeout_seconds" => "0", "cache_seconds" => "-5")
+    result = configuration("look_back_hours" => "soon", "maximum_rows" => "0", "timeout_seconds" => "0", "cache_seconds" => "-5")
 
-    assert_equal 24, result.lookback_hours
+    assert_equal 24, result.look_back_hours
     assert_equal 1, result.maximum_rows
     assert_equal 1, result.timeout_seconds
     assert_equal 0, result.cache_seconds
@@ -146,7 +158,7 @@ class RubylodeGlitchtip::ConfigurationTest < ActiveSupport::TestCase
   end
 
   test "the block title is never empty" do
-    assert_equal "Errors needing attention", configuration("block_title" => "  ").block_title
+    assert_equal "Errors", configuration("block_title" => "  ").block_title
     assert_equal "Alerts", configuration("block_title" => "Alerts").block_title
   end
 end

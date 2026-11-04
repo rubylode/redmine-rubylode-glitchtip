@@ -43,24 +43,24 @@ module RubylodeGlitchtip
       end
 
       # The report for a page. Whatever goes wrong while building it, the page gets a "status unavailable" report and never an error.
-      def safe_report(configuration = Configuration.current)
-        current(configuration).report
+      def safe_report(settings = Settings.current)
+        current(settings).report
       rescue StandardError => error
         Rails.logger.warn("Rubylode GlitchTip: could not build the errors block: #{error.class}: #{error.message}")
         Report.new([], 0, 0, 0, I18n.t("rubylode_glitchtip.status.unavailable"), true, error.class.name)
       end
 
-      def current(configuration = Configuration.current)
+      def current(settings = Settings.current)
         now = Time.current
-        new(rule: AttentionRule.new(now: now, lookback_hours: configuration.lookback_hours,
-                                    minimum_event_count: configuration.minimum_event_count,
-                                    levels: configuration.levels, project_slugs: configuration.project_allow_list),
-            maximum_rows: configuration.maximum_rows,
-            fetch_issues: -> { GlitchtipClient.from_configuration(configuration, now: now).call },
+        new(rule: AttentionRule.new(now: now, lookback_hours: settings.look_back_hours,
+                                    minimum_event_count: settings.minimum_event_count,
+                                    levels: settings.levels, project_slugs: settings.project_allow_list),
+            maximum_rows: settings.maximum_rows,
+            fetch_issues: -> { GlitchtipClient.from_settings(settings, now: now).call },
             cache: cache,
-            cache_key: cache_key_for(configuration.base_url, configuration.organization_slug, configuration.lookback_hours),
-            cache_seconds: configuration.cache_seconds,
-            failure_seconds: configuration.failure_cache_seconds)
+            cache_key: cache_key_for(settings.base_url, settings.organization_slug, settings.look_back_hours),
+            cache_seconds: settings.cache_seconds,
+            failure_seconds: settings.failure_cache_seconds)
       end
     end
 

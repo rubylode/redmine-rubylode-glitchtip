@@ -15,22 +15,16 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-module RedmineRubylodeGlitchtip
-  # The wiki macro. Redmine's autoloader expects a constant named after the file, hence the module.
-  module Macros
-    def self.register_all
-      Redmine::WikiFormatting::Macros.register do
-        desc <<~DESCRIPTION
-          Shows the recent GlitchTip errors that need attention, as set in the Rubylode GlitchTip settings.
-            {{glitchtip_errors}}
-            {{glitchtip_errors(title=Production errors)}}
-          Nothing is shown to people who are not allowed to see it.
-        DESCRIPTION
-        macro :glitchtip_errors do |_object, arguments|
-          _positional, options = extract_macro_options(arguments, :title)
-          render partial: "rubylode_glitchtip/errors", locals: { title: options[:title].presence }
-        end
-      end
-    end
+require_relative "../../lib/rubylode_glitchtip/settings"
+require_relative "../../lib/rubylode_glitchtip/settings_migration"
+
+# Version 2.0.0 renamed some settings and changed what "My page" means. See RubylodeGlitchtip::SettingsMigration.
+class RenameSettingsForTwoPointZero < ActiveRecord::Migration[6.1]
+  def up
+    RubylodeGlitchtip::SettingsMigration.up
+  end
+
+  def down
+    RubylodeGlitchtip::SettingsMigration.down
   end
 end
