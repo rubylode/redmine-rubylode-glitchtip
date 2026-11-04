@@ -6,7 +6,7 @@ Show the GlitchTip errors that may need attention inside Redmine: unresolved iss
 
 ## Decisions
 
-- One settings form, the token only in an environment variable, a wiki macro, a page, a My page block and a partial. The answer is cached, with a shorter cache after a failure, and a failure shows "Status unavailable" instead of an error page.
+- One settings form, the token only in an environment variable, a wiki macro, a page, a My page block, a partial and a block on the Status page of Rubylode Status. The answer is cached, with a shorter cache after a failure, and a failure shows "Status unavailable" instead of an error page.
 - An issue needs attention when it is unresolved, not ignored and last seen in the window. The plugin filters after fetching, so it does not depend on how GlitchTip reads `start`, `end` or a search query. The event count is the issue's total.
 - The plugin builds the issue link as `{address}/{organization}/issues/{id}`. GlitchTip documents its `permalink` field with the default "Not implemented", so it is not used.
 - The token's variable name must start with `GLITCHTIP_`. The token goes only to the saved host, over https unless the host is loopback or http is explicitly allowed. Redirects are never followed.

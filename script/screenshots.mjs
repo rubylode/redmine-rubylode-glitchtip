@@ -32,14 +32,14 @@ async function shoot(fileName, url, selector) {
 }
 
 await useScenario("several");
-await shoot("errors-page.png", "/glitchtip_errors", "#content .rubylode-glitchtip-errors");
+await shoot("errors-page.png", "/status/glitchtip", "#content .rubylode-glitchtip-errors");
 await shoot("wiki-macro.png", "/projects/storefront/wiki", "#content .rubylode-glitchtip-errors");
 await shoot("compact-on-issues.png", "/issues", "#content .rubylode-glitchtip-errors");
 await shoot("welcome-page.png", "/", "#content");
 await useScenario("none");
-await shoot("errors-none.png", "/glitchtip_errors", "#content .rubylode-glitchtip-errors");
+await shoot("errors-none.png", "/status/glitchtip", "#content .rubylode-glitchtip-errors");
 await useScenario("unavailable");
-await shoot("errors-unavailable.png", "/glitchtip_errors", "#content .rubylode-glitchtip-errors");
+await shoot("errors-unavailable.png", "/status/glitchtip", "#content .rubylode-glitchtip-errors");
 await useScenario("several");
 await shoot("settings.png", "/settings/plugin/redmine_rubylode_glitchtip", ".rubylode-glitchtip-placements");
 await shoot("settings-help.png", "/settings/plugin/redmine_rubylode_glitchtip", ".rubylode-glitchtip-help");

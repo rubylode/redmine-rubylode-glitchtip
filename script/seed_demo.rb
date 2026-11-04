@@ -74,7 +74,7 @@ def ensure_wiki_page(project, author)
 
     Errors that may need attention right now:
 
-    {{glitchtip_errors}}
+    {{glitchtip_status}}
   TEXT
   page.save!
 end
@@ -94,13 +94,13 @@ Mailer.with_deliveries(false) do
   Setting.send(:"plugin_#{PLUGIN_ID}=", Setting.send(:"plugin_#{PLUGIN_ID}").to_h.merge(
     "base_url" => "http://fake_glitchtip:9100", "organization_slug" => "demo-org", "allow_plain_http" => "1",
     "cache_seconds" => "0", "failure_cache_seconds" => "0", "levels" => %w[fatal error warning],
-    "show_on_welcome_page" => "1", "welcome_page_column" => "right", "path_patterns" => "/issues\n/projects/*/issues",
+    "show_on_welcome_page" => "1", "welcome_page_column" => "right", "show_on_matching_pages" => "1", "matching_page_paths" => "/issues\n/projects/*/issues",
     "show_in_top_menu" => "1"
   ))
 
   [admin, sam].each do |user|
     preference = user.pref
-    preference.my_page_layout = { "top" => ["rubylode_glitchtip_errors"], "left" => ["issuesassignedtome"], "right" => [] }
+    preference.my_page_layout = { "top" => ["rubylode_glitchtip_status"], "left" => ["issuesassignedtome"], "right" => [] }
     preference.save!
   end
 end

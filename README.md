@@ -10,25 +10,27 @@
 ![Ruby](https://img.shields.io/badge/Ruby-3.2%20%7C%203.3%20%7C%203.4%20%7C%204.0-cc342d)
 
 TL;DR: this plugin shows the recent [GlitchTip](https://glitchtip.com) errors that may need attention inside
-[Redmine](https://www.redmine.org), as a wiki macro, a page, a My page block and a partial.
+[Redmine](https://www.redmine.org), as a wiki macro, a page, a My page block, a partial and a block on the Status page.
 
-Each one is a summary line and a table with the project, level, event count, last seen and a link to the issue in GlitchTip.
+Each shows a summary line and a table with the project, level, event count, last seen and a link to the issue in GlitchTip.
 The token stays in an environment variable and the block only reads.
 
-Status: version 1.1.1, needs Redmine 5.1 or newer. `docs/roadmap/ROADMAP.md` lists what is decided and what is still open.
+Status: version 2.0.0, needs Redmine 5.1 or newer. Upgrading from 1.x? Read the [changelog](CHANGELOG.md) first: settings were
+renamed and the page moved. `docs/roadmap/ROADMAP.md` lists what is decided and what is still open.
 
 Contents:
 
 - [What it does](#what-it-does)
 - [What needs attention](#what-needs-attention)
-- [How to show the block on other pages](#how-to-show-the-block-on-other-pages)
-- [Installation](#installation)
+- [Install](#install)
 - [Settings](#settings)
+- [Where it shows](#where-it-shows)
 - [Security](#security)
 - [Theming](#theming)
 - [Try it](#try-it)
 - [Troubleshooting](#troubleshooting)
 - [Tests](#tests)
+- [Releasing](#releasing)
 - [License](#license)
 
 ## What it does
@@ -36,18 +38,19 @@ Contents:
 A summary line ("No errors need attention", or "3 issues need attention, 214 events") and, under it, a table of the issues:
 title and culprit, project, level, event count and when it was last seen. The title links to the issue in GlitchTip.
 
-![The page at /glitchtip_errors with five issues, the fatal one first](docs/screenshots/errors-page.png)
+![The plugin's page with five issues, the fatal one first](docs/screenshots/errors-page.png)
 
-Ways to show it (the section [How to show the block on other pages](#how-to-show-the-block-on-other-pages) has the details):
+Ways to show it ([Where it shows](#where-it-shows) has the details):
 
-- A wiki macro: `{{glitchtip_errors}}`, or `{{glitchtip_errors(title=Production errors)}}`.
+- A wiki macro: `{{glitchtip_status}}`, or `{{glitchtip_status(title=Production errors)}}`.
 
   ![The macro on a wiki page](docs/screenshots/wiki-macro.png)
 
-- A page at `/glitchtip_errors`.
-- A My page block called "Errors needing attention" (`rubylode_glitchtip_errors`), added from the My page's block list.
-- A partial other plugins and views can render: `render partial: "rubylode_glitchtip/errors"`, with the optional locals
+- A page at `/status/glitchtip`.
+- A My page block called "Errors" (`rubylode_glitchtip_status`), added from the My page's block list.
+- A partial other plugins and views can render: `render partial: "rubylode_glitchtip/status"`, with the optional locals
   `title` and `show_title`.
+- A block on the Status page of [Rubylode Status](https://github.com/rubylode/redmine-rubylode-status), when that is installed.
 
 When nothing needs attention the summary says so and there is no table:
 
@@ -75,130 +78,147 @@ An issue needs attention when all of these hold:
 - it belongs to one of the projects in the allow-list, when there is one.
 
 The issues are ordered by level (fatal, error, warning, info, debug), then by event count (most first), then by last seen
-(newest first). Up to "maximum rows" are shown; the summary still counts all of them ("and 4 more issues" is shown under the
+(newest first). Up to "Maximum rows" are shown; the summary still counts all of them ("and 4 more issues" is shown under the
 table).
 
 The rule is one small class, `RubylodeGlitchtip::AttentionRule`, with its own unit tests.
 
-## How to show the block on other pages
+## Install
 
-The block is one partial, so every place below shows the same thing, for the same people (the setting "Who may see it"),
-from the same cached answer: GlitchTip is asked once for all of them. The same help is on the plugin's settings page.
+Redmine 5.1 or newer.
 
-### In text
+1. Put the plugin folder in Redmine's `plugins/` directory, named `redmine_rubylode_glitchtip`.
+2. Run `bundle exec rake redmine:plugins:migrate RAILS_ENV=production`.
+3. If the plugin reads an environment variable, set it where Redmine runs, then restart Redmine.
+4. In Administration, Plugins, open the plugin and choose Configure.
 
-Type the macro in a wiki page, a news item, an issue description or comment, a forum message, the project
-description, or the welcome text (Administration, Settings, General). The welcome text is drawn with Redmine's text
-formatter (`textilizable` in `app/views/welcome/index.html.erb`, checked in Redmine 7.0.2), so a macro in it works like one in
-a wiki page.
+The plugin reads an environment variable: create an API token in GlitchTip (Profile, Auth Tokens) with read access to
+issues and put it in a variable that starts with `GLITCHTIP_`, for example `GLITCHTIP_API_TOKEN`, before Redmine starts. Then
+set the GlitchTip address and the organization slug in the settings.
 
-    {{glitchtip_errors}}
-    {{glitchtip_errors(title=Production errors)}}
+To get the folder, clone it: `git clone https://github.com/rubylode/redmine-rubylode-glitchtip.git redmine_rubylode_glitchtip`.
+To remove the plugin, run `bundle exec rake redmine:plugins:migrate NAME=redmine_rubylode_glitchtip VERSION=0 RAILS_ENV=production`,
+delete the folder and restart. The settings are one row in the settings table.
 
-### On My page
-
-Open My page, Personalize this page, choose "Errors needing attention" in the block list and Add. Each person
-adds it for themselves. "My page" in the settings (on by default) turns the block off everywhere on My page when unticked.
-
-### On the welcome page and every project's Overview
-
-Tick "Welcome page" or "Project Overview page" in the settings and
-choose the left or the right column. They use Redmine's own hooks (`view_welcome_index_left`/`_right`,
-`view_projects_show_left`/`_right`).
-
-![The welcome page with the block in the right column](docs/screenshots/welcome-page.png)
-
-### At the end of chosen pages
-
-List path patterns in "Pages matching these paths", one per line, and the compact block (no
-project column, no culprit) is drawn after the page's content:
-
-    /issues
-    /projects/*/issues
-    /projects/*/wiki/*
-
-![The compact block at the end of the issues list](docs/screenshots/compact-on-issues.png)
-
-A `*` matches any characters, slashes included. The query string and a trailing slash are ignored (`/issues` matches
-`/issues?set_filter=1` and `/issues/`). Settings, administration, sign-in and account pages never match, not even `/*`,
-unless a pattern starts with their own path (`/admin/*`). The block's own page never matches. Only plain page views get it,
-not form posts or AJAX requests. The form refuses a pattern that does not start with `/`, has a scheme or host, spaces, or is
-longer than 200 characters, and more than 20 patterns.
-
-### In a theme or another plugin
-
-Render the partial. Optional locals: `title` (a heading of its own), `show_title` (`false`
-hides the heading), `compact` (`true` for the smaller block), `inline_stylesheet` (`true` when the page's head has been sent
-already, so the partial carries its own stylesheet link).
-
-    <%= render partial: "rubylode_glitchtip/errors" %>
-    <%= render partial: "rubylode_glitchtip/errors", locals: { title: "Production errors", compact: true } %>
-
-### As a page, and in the top menu
-
-The page is `/glitchtip_errors`. Redmine 7 has no screen for custom top-menu links: a
-menu item is registered by a plugin (`menu :top_menu, ...` in `init.rb`, `Redmine::Plugin#menu`). This plugin registers one and
-shows it while "Show in the top menu" is ticked and the person may see the block; its caption is the block title.
-
-| Place | How | Needs a setting |
-|---|---|---|
-| Wiki pages, news, issues, forums, project description | `{{glitchtip_errors}}` | No |
-| Welcome text | `{{glitchtip_errors}}` in Administration, Settings, General | No |
-| My page | Personalize this page, then Add | "My page" (on by default) |
-| Welcome page | Tick "Welcome page" | Yes: Welcome page |
-| Project Overview page | Tick "Project Overview page" | Yes: Project Overview page |
-| Any other page | List the path, such as `/issues` | Yes: Pages matching these paths |
-| A theme or another plugin | `render partial: "rubylode_glitchtip/errors"` | No |
-| Its own page | Open `/glitchtip_errors` | No |
-| Top menu | Tick "Show in the top menu" | Yes: Show in the top menu |
-
-## Installation
-
-Redmine 5.1 or newer. The folder must be named `redmine_rubylode_glitchtip`, the same as the plugin id.
-
-1. Put the plugin in your Redmine's `plugins` folder:
-
-       cd /path/to/redmine/plugins
-       git clone https://github.com/rubylode/redmine-rubylode-glitchtip.git redmine_rubylode_glitchtip
-
-2. Create an API token in GlitchTip (Profile, Auth Tokens) with read access to issues, and put it in an environment
-   variable that starts with `GLITCHTIP_`, for example `GLITCHTIP_API_TOKEN`, before Redmine starts.
-3. Restart Redmine ([Passenger](https://www.phusionpassenger.com), [Puma](https://puma.io), whatever serves it). There is
-   no migration.
-4. Open Administration, Plugins, Rubylode GlitchTip, Configure, and set the GlitchTip address and the organization slug.
-
-To remove it, delete the folder and restart. The settings are one row in the settings table.
+Upgrading from 1.x: step 2 moves your saved settings to the new names. The changelog lists what changed.
 
 ## Settings
 
 | Setting | Default | Meaning |
 |---|---|---|
-| GlitchTip address | empty | For example `https://glitchtip.example.com`. |
-| Organization slug | empty | The organization's short name in GlitchTip's address. |
-| Token environment variable | `GLITCHTIP_API_TOKEN` | The name of the variable holding the token, not the token. Must start with `GLITCHTIP_`. |
-| Extra hosts for the token | empty | Optional further host names the token may be sent to. |
+| GlitchTip address | empty | For example `https://glitchtip.example.com`. Empty means the block is shown to administrators only, with a hint. |
+| Organization slug | empty | The organization's short name: the first part of the path in GlitchTip's address. |
+| Token variable | `GLITCHTIP_API_TOKEN` | The name of the variable holding the token, not the token. Must start with `GLITCHTIP_`. |
+| Allowed hosts | empty | Hosts that may receive the token besides the address above, separated by spaces or commas. |
 | Allow plain http | off | See [Security](#security). |
-| Look-back hours | 24 | An issue needs attention when seen within this many hours. |
+| Look-back hours | 24 | An issue needs attention when it was seen again within this many hours. |
 | Minimum event count | 1 | Issues with fewer events in total are left out. |
 | Levels to include | error, fatal | Any of fatal, error, warning, info, debug. |
 | Maximum rows | 10 | From 1 to 100. |
 | Projects | empty | Optional GlitchTip project slugs; empty means all projects. |
 | Cache seconds | 60 | GlitchTip is asked at most once in this many seconds. |
-| Failure cache seconds | 30 | After a failed answer GlitchTip is left alone for this long. |
-| Timeout seconds | 2 | Connect and read timeout. |
-| Block title | Errors needing attention | Heading of the block. |
-| Who may see it | everyone signed in | Or administrators only. |
-| My page | on | The My page block draws nothing when this is off. |
-| Welcome page | off | Show the block on the welcome page, in the left or the right column. |
-| Project Overview page | off | Show the block on every project's Overview, left or right. |
-| Pages matching these paths | empty | Path patterns, one per line; the compact block goes after the page. |
-| Show in the top menu | off | A top-menu link to `/glitchtip_errors`. |
+| Failure cache seconds | 30 | After a failed answer GlitchTip is left alone for this many seconds. |
+| Timeout seconds | 2 | A request to GlitchTip is given up after this many seconds. |
+| Block title | Errors | The heading of the block and the name of the top menu link. |
+| Who may see the block | Everyone who is signed in | Or administrators only. |
+| Welcome page | off | Adds the block to Redmine's home page, in the left or the right column. |
+| My page | off | Adds the block to the default My page, for people who have not arranged their own. |
+| Project Overview page | off | Adds the block to every project's Overview page, left or right. |
+| Pages matching these paths | off | Adds a small version of the block to each page whose path matches one of the paths. |
+| Paths | empty | One path per line, starting with `/`. |
+| Show in the top menu | off | Adds a link to `/status/glitchtip` to the top menu. Hidden while Rubylode Status is installed. |
 
 ![The Show the block on section of the settings](docs/screenshots/settings.png)
 
 ![The help on the settings page](docs/screenshots/settings-help.png)
 
 The form checks the values before saving and shows what is wrong; nothing is saved until they are right.
+
+## Where it shows
+
+The block is one partial, so every place below shows the same block, to the same people (the setting "Who may see the block"),
+from the same cached answer: GlitchTip is asked once for all of them. The same help is on the plugin's settings page.
+
+### Status page
+
+With [Rubylode Status](https://github.com/rubylode/redmine-rubylode-status) installed, the block is on its Status page and
+the plugin drops its own top menu item. The plugin's own page, `/status/glitchtip`, is there with or without it. The Status
+plugin gets the state (no errors, some need a look, GlitchTip not answering, or not set up), a one-line summary and the list of issues.
+
+### In text
+
+Type the macro in a wiki page, a news item, an issue description or comment, a forum message, the project
+description, or the welcome text (Administration, Settings, General). The welcome text is drawn with Redmine's text
+formatter, so a macro in it works like one in a wiki page.
+
+    {{glitchtip_status}}
+    {{glitchtip_status(title=Production errors)}}
+
+The macro was called `glitchtip_errors` before 2.0.0. The old name still works in 2.x.
+
+### On My page
+
+Open My page, Personalize this page, choose "Errors" in the block list and Add. Each person adds it for themselves, whatever
+the setting says. Check "My page" in the settings to add it to the default My page, which people get until they arrange their own.
+
+### On the welcome page and every project's Overview
+
+Check "Welcome page" or "Project Overview page" in the settings and choose the left or the right column. They use
+Redmine's own hooks (`view_welcome_index_left`/`_right`, `view_projects_show_left`/`_right`).
+
+![The welcome page with the block in the right column](docs/screenshots/welcome-page.png)
+
+### At the end of chosen pages
+
+Check "Pages matching these paths" and list the paths in "Paths", one per line. The compact block (no project column, no
+culprit) is drawn after the page's content:
+
+    /issues
+    /projects/*/issues
+    /projects/*/wiki/**
+
+![The compact block at the end of the issues list](docs/screenshots/compact-on-issues.png)
+
+A `*` stands for anything inside one path segment and `**` for anything, slashes included. The query string and a trailing slash are ignored (`/issues` matches
+`/issues?set_filter=1` and `/issues/`). Settings, administration, sign-in and account pages never match, not even `/*`,
+unless a path starts with their own path (`/admin/**`). The block's own page never matches. Only plain page views get it,
+not form posts or AJAX requests. The form refuses a path that does not start with `/`, has a scheme or host, spaces, or is
+longer than 200 characters, and more than 20 paths.
+
+### In a theme or another plugin
+
+Render the partial. Optional locals:
+
+- `title`: a heading of its own
+- `show_title`: `false` hides the heading
+- `compact`: `true` for the smaller block
+- `inline_stylesheet`: `true` when the page has already sent its head, so the partial carries its own stylesheet link
+
+```erb
+<%= render partial: "rubylode_glitchtip/status" %>
+<%= render partial: "rubylode_glitchtip/status", locals: { title: "Production errors", compact: true } %>
+```
+
+The partial was called `rubylode_glitchtip/errors` before 2.0.0. The old name still works in 2.x.
+
+### As a page, and in the top menu
+
+The page is `/status/glitchtip`. Check "Show in the top menu" for a link to it, named like the block title. The old page,
+`/glitchtip_errors`, redirects there in 2.x.
+
+### All the places
+
+| Place | How | Needs a setting |
+|---|---|---|
+| Wiki pages, news, issues, forums, project description | `{{glitchtip_status}}` | No |
+| Welcome text | `{{glitchtip_status}}` in Administration, Settings, General | No |
+| My page | Personalize this page, then Add | No ("My page" adds it to the default My page) |
+| Welcome page | Check "Welcome page" | Welcome page |
+| Project Overview page | Check "Project Overview page" | Project Overview page |
+| Any other page | Check "Pages matching these paths" and list the path, such as `/issues` | Pages matching these paths |
+| A theme or another plugin | `render partial: "rubylode_glitchtip/status"` | No |
+| Its own page | Open `/status/glitchtip` | No |
+| Top menu | Check "Show in the top menu" | Show in the top menu |
 
 ## Security
 
@@ -209,18 +229,18 @@ The form checks the values before saving and shows what is wrong; nothing is sav
   variable of the server, such as `SECRET_KEY_BASE` or a database password, and have it sent to the address they typed. The
   form refuses other names, and at run time a name outside the prefix is ignored: the token counts as missing and the
   environment is not read.
-- The token goes only to the saved host. It is sent to the host of the GlitchTip address (plus the extra hosts, when you
+- The token goes only to the saved host. It is sent to the host of the GlitchTip address (plus the allowed hosts, when you
   list any). Redirects are never followed, so a GlitchTip that answers with a redirect to another host does not get the
   token there; the block shows "Status unavailable".
-- https is required, except for a loopback host (`localhost`, `127.0.0.1`, `::1`). For GlitchTip on an internal network
-  without TLS, tick "Allow plain http"; the token then travels unencrypted, so use it only on a network you trust.
+- https is required, except for a loopback host (`localhost`, `127.0.0.1`, `::1`). For GlitchTip on a network you trust
+  without TLS, check "Allow plain http"; the token then travels unencrypted.
 - Everything GlitchTip sends is escaped where it is shown.
 - Read access is enough. Give the token the least it needs: reading issues.
 
 ## Theming
 
-The block uses plain CSS (`assets/stylesheets/rubylode_glitchtip.css`), and every colour and size is a
-`--rubylode-glitchtip-*` custom property set on `.rubylode-glitchtip-errors`. Where Redmine 7 has a colour variable the
+The block uses plain CSS (`assets/stylesheets/rubylode_glitchtip.css`), and every color and size is a
+`--rubylode-glitchtip-*` custom property set on `.rubylode-glitchtip-errors`. Where Redmine 7 has a color variable the
 default follows it, the dark palette follows the system setting, and a theme that marks its dark mode on the page wins over
 that.
 
@@ -247,7 +267,7 @@ A throwaway Redmine 7 runs from this folder, with a fake GlitchTip next to it (`
     ruby bin/demo restart            pick up a change to the plugin
     ruby bin/demo reset              wipe it
 
-Sign in as `admin` / `admin`, or as `sam.rivera` / `demo-password-1`. The page is `/glitchtip_errors`, the macro is on the
+Sign in as `admin` / `admin`, or as `sam.rivera` / `demo-password-1`. The page is `/status/glitchtip`, the macro is on the
 Storefront project's wiki, and the block is on My page. Everything in the fake GlitchTip is made up.
 
 The screenshots above come from `node script/screenshots.mjs` ([Playwright](https://playwright.dev); the script's header says
@@ -255,16 +275,20 @@ how to install it).
 
 ## Troubleshooting
 
-If the cache store cannot be read or written (a cache file owned by another user, a full disk), the plugin logs a warning with the error class and message, treats the cache as empty and fetches live. The page still renders.
+If the cache store cannot be read or written (a cache file owned by another user, a full disk), the plugin logs a warning with the error class and message, treats the cache as empty and asks GlitchTip again. The page still renders.
+
+If the block is missing after an upgrade from 1.x, check that step 2 of the install ran: it moves the saved settings to the new names. Run it again, it is safe to repeat.
 
 ## Tests
 
     bin/test                                         all unit and integration tests
     bin/test test/unit/attention_rule_test.rb        one file
 
-They run in a Redmine 7 image with its test gems (`docker/test.Dockerfile`). The rule, the settings, the client and the
-report are plain Ruby classes with unit tests; the client is also tested over a real socket against the fake GlitchTip, and
-the integration tests cover the page, the macro, the My page block, the settings form and the token's secrecy.
+They run in a Redmine 7 image with its test gems (`docker/test.Dockerfile`). When a checkout of the Status plugin sits next
+to this folder (`../redmine-rubylode-status`), `bin/test` mounts it read-only beside this plugin, so the tests also run against
+its real registry; set `WITHOUT_STATUS_PLUGIN=1` to leave it out. The rule, the settings, the client and the report are plain
+Ruby classes with unit tests; the client is also tested over a real socket against the fake GlitchTip, and the integration
+tests cover the page, the macro, the My page block, the settings form and the token's secrecy.
 
 Pull Requests are welcome!
 
