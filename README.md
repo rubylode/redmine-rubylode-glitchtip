@@ -15,7 +15,7 @@ TL;DR: this plugin shows the recent [GlitchTip](https://glitchtip.com) errors th
 Each shows a summary line and a table with the project, level, event count, last seen and a link to the issue in GlitchTip.
 The token stays in an environment variable and the block only reads.
 
-Status: version 2.0.0, needs Redmine 5.1 or newer. Upgrading from 1.x? Read the [changelog](CHANGELOG.md) first: settings were
+Status: version 2.1.0, needs Redmine 5.1 or newer. Upgrading from 1.x? Read the [changelog](CHANGELOG.md) first: settings were
 renamed and the page moved. `docs/roadmap/ROADMAP.md` lists what is decided and what is still open.
 
 Contents:

@@ -13,11 +13,11 @@ The text to paste at www.redmine.org, Plugins, New plugin. Redmine's "Check for 
 
 ## Notes for this version
 
-Version 2.0.0. Recent GlitchTip errors that may need attention: a wiki macro, a page, a My page block, a partial and a Status page widget. Needs Redmine 5.1 or newer. Upgrading from 1.x moves the saved settings to new names: see the changelog. Install and settings are described in the README at https://github.com/rubylode/redmine-rubylode-glitchtip.
+Version 2.1.0. Recent GlitchTip errors that may need attention: a wiki macro, a page, a My page block, a partial and a Status page widget. Needs Redmine 5.1 or newer. Upgrading from 1.x moves the saved settings to new names: see the changelog. Install and settings are described in the README at https://github.com/rubylode/redmine-rubylode-glitchtip.
 
 ## File to upload
 
-`redmine_rubylode_glitchtip-2.0.0.zip`, the file the GitHub release workflow publishes when a `v2.0.0` tag is pushed. Upload the same file that is attached to the GitHub release.
+`redmine_rubylode_glitchtip-2.1.0.zip`, the file the GitHub release workflow publishes when a `v2.0.0` tag is pushed. Upload the same file that is attached to the GitHub release.
 
 ## Checking the result
 

@@ -24,7 +24,7 @@ Redmine::Plugin.register :redmine_rubylode_glitchtip do
   author_url "https://github.com/rubylode"
   url "https://github.com/rubylode/redmine-rubylode-glitchtip"
   description "Recent GlitchTip errors that may need attention: a wiki macro, a page, a My page block, a partial and a Status page widget"
-  version "2.0.0"
+  version "2.1.0"
   requires_redmine version_or_higher: "5.1.0"
 
   # An optional link in the top menu to the page. A menu item has no setting of its own in Redmine, so the item is always
