@@ -60,7 +60,5 @@ Rails.configuration.to_prepare(&apply_patches)
 
 # Puts the block on the Status page when Rubylode Status is installed. See its docs/widget-contract.md.
 Rails.application.config.after_initialize do
-  if defined?(RubylodeStatus::Registry)
-    RubylodeGlitchtip::StatusWidget.register(RubylodeStatus::Registry)
-  end
+  RubylodeGlitchtip::StatusWidget.register
 end
