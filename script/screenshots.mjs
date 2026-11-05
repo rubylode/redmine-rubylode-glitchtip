@@ -32,7 +32,14 @@ async function shoot(fileName, url, selector) {
 }
 
 await useScenario("several");
-await shoot("errors-page.png", "/status/glitchtip", "#content .rubylode-glitchtip-errors");
+await page.goto(`${redmine}/status/glitchtip`);
+const contentBox = await page.locator("#content").boundingBox();
+const noticeBox = await page.locator("#content .rubylode-status-notice").boundingBox();
+await page.screenshot({
+  path: path.join(outputFolder, "errors-page.png"),
+  clip: { x: contentBox.x, y: contentBox.y, width: contentBox.width, height: noticeBox.y + noticeBox.height - contentBox.y + 8 }
+});
+console.log("wrote errors-page.png");
 await shoot("wiki-macro.png", "/projects/storefront/wiki", "#content .rubylode-glitchtip-errors");
 await shoot("compact-on-issues.png", "/issues", "#content .rubylode-glitchtip-errors");
 await shoot("welcome-page.png", "/", "#content");
