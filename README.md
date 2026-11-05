@@ -38,7 +38,7 @@ Contents:
 A summary line ("No errors need attention", or "3 issues need attention, 214 events") and, under it, a table of the issues:
 title and culprit, project, level, event count and when it was last seen. The title links to the issue in GlitchTip.
 
-![The plugin's page with five issues, the fatal one first](docs/screenshots/errors-page.png)
+![The plugin's page at /status/glitchtip, titled Errors, with five issues (the fatal one first) and the Status plugin notice](docs/screenshots/errors-page.png)
 
 Ways to show it ([Where it shows](#where-it-shows) has the details):
 
