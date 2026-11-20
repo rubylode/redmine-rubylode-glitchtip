@@ -2,6 +2,12 @@
 
 All notable changes to this plugin. The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
+## [2.1.2] - 2026-11-19
+
+### Changed
+
+- The release zip holds only what Redmine needs: the tests, the docs and the development scripts are left out.
+
 ## [2.1.1] - 2026-11-19
 
 No change to what the plugin does. This release carries an internal cleanup.
@@ -123,6 +129,7 @@ Every placement uses the same partial, so each follows "Who may see the block" a
 - A throwaway demo Redmine on port 3014 with a fake GlitchTip, and a Playwright script for the screenshots.
 
 [Unreleased]: https://github.com/rubylode/redmine-rubylode-glitchtip/compare/v1.1.1...HEAD
+[2.1.2]: https://github.com/rubylode/redmine-rubylode-glitchtip/compare/v2.1.1...v2.1.2
 [2.1.0]: https://github.com/rubylode/redmine-rubylode-glitchtip/compare/v2.0.0...v2.1.0
 [2.0.0]: https://github.com/rubylode/redmine-rubylode-glitchtip/compare/v1.1.1...v2.0.0
 [1.1.1]: https://github.com/rubylode/redmine-rubylode-glitchtip/compare/v1.1.0...v1.1.1
