@@ -13,15 +13,15 @@ The text to paste at www.redmine.org, Plugins, New plugin. Redmine's "Check for 
 
 ## Notes for this version
 
-Version 2.1.2. Recent GlitchTip errors that may need attention: a wiki macro, a page, a My page block, a partial and a Status page widget. Needs Redmine 5.1 or newer. Upgrading from 1.x moves the saved settings to new names: see the changelog. Install and settings are described in the README at https://github.com/rubylode/redmine-rubylode-glitchtip.
+Version 2.2.0. Recent GlitchTip errors that may need attention: a wiki macro, a page, a My page block, a partial and a Status page widget. Needs Redmine 5.1 or newer. Upgrading from 1.x moves the saved settings to new names: see the changelog. Install and settings are described in the README at https://github.com/rubylode/redmine-rubylode-glitchtip.
 
 ## File to upload
 
-`redmine_rubylode_glitchtip-2.1.2.zip`, the file the GitHub release workflow publishes when a `v2.1.2` tag is pushed. Upload the same file that is attached to the GitHub release.
+`redmine_rubylode_glitchtip-2.2.0.zip`, the file the GitHub release workflow publishes when a `v2.2.0` tag is pushed. Upload the same file that is attached to the GitHub release.
 
 ## Checking the result
 
-The name, author and version in the listing must match what the plugin registers (`Rubylode GlitchTip`, `Rubylode`, `2.1.2`). When they do, Administration, Plugins, Check for updates shows:
+The name, author and version in the listing must match what the plugin registers (`Rubylode GlitchTip`, `Rubylode`, `2.2.0`). When they do, Administration, Plugins, Check for updates shows:
 
 - a green tick: the installed version is the latest one listed on redmine.org;
 - an amber warning: redmine.org lists a newer version than the installed one;

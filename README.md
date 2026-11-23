@@ -15,7 +15,7 @@ TL;DR: this plugin shows the recent [GlitchTip](https://glitchtip.com) errors th
 Each shows a summary line and a table with the project, level, event count, last seen and a link to the issue in GlitchTip.
 The token stays in an environment variable and the block only reads.
 
-Status: version 2.1.2, needs Redmine 5.1 or newer. Upgrading from 1.x? Read the [changelog](CHANGELOG.md) first: settings were
+Status: version 2.2.0, needs Redmine 5.1 or newer. Upgrading from 1.x? Read the [changelog](CHANGELOG.md) first: settings were
 renamed and the page moved. `docs/roadmap/ROADMAP.md` lists what is decided and what is still open.
 
 Contents:
@@ -138,6 +138,12 @@ The form checks the values before saving and shows what is wrong; nothing is sav
 
 The block is one partial, so every place below shows the same block, to the same people (the setting "Who may see the block"),
 from the same cached answer: GlitchTip is asked once for all of them. The same help is on the plugin's settings page.
+
+### Link to GlitchTip
+
+Every place the block shows has a short link, "Open GlitchTip", right-aligned above the table. It opens the issues page of the
+organization under the saved address. It also shows while GlitchTip does not answer, and not while the plugin is not set up
+or for a person the block is hidden from. There is no setting for it.
 
 ### Status page
 

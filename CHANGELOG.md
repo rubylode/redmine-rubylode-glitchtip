@@ -2,6 +2,12 @@
 
 All notable changes to this plugin. The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
+## [2.2.0] - 2026-11-23
+
+### Added
+
+- An "Open GlitchTip" link, right-aligned above the table, that opens the organization's issues page in GlitchTip. It shows wherever the block shows, also while GlitchTip does not answer, and not while the plugin is not set up.
+
 ## [2.1.2] - 2026-11-19
 
 ### Changed
@@ -129,6 +135,7 @@ Every placement uses the same partial, so each follows "Who may see the block" a
 - A throwaway demo Redmine on port 3014 with a fake GlitchTip, and a Playwright script for the screenshots.
 
 [Unreleased]: https://github.com/rubylode/redmine-rubylode-glitchtip/compare/v1.1.1...HEAD
+[2.2.0]: https://github.com/rubylode/redmine-rubylode-glitchtip/compare/v2.1.2...v2.2.0
 [2.1.2]: https://github.com/rubylode/redmine-rubylode-glitchtip/compare/v2.1.1...v2.1.2
 [2.1.0]: https://github.com/rubylode/redmine-rubylode-glitchtip/compare/v2.0.0...v2.1.0
 [2.0.0]: https://github.com/rubylode/redmine-rubylode-glitchtip/compare/v1.1.1...v2.0.0
