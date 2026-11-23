@@ -46,6 +46,30 @@ class RubylodeGlitchtip::StatusPageWidgetTest < Redmine::IntegrationTest
     assert_select ".rubylode-glitchtip-errors-table", text: /Boom/
   end
 
+  test "the Status page shows the link to GlitchTip above the table" do
+    log_user("jsmith", "jsmith")
+    get "/status"
+
+    assert_select "a.rubylode-glitchtip-source-link.external[href=?]", "#{BASE_URL}/#{ORGANIZATION}/issues", text: "Open GlitchTip"
+    assert_select ".rubylode-glitchtip-source-link-line ~ table.rubylode-glitchtip-errors-table"
+  end
+
+  test "the Status page shows the link when GlitchTip cannot be reached" do
+    publish_failure("timeout")
+    log_user("jsmith", "jsmith")
+    get "/status"
+
+    assert_select "a.rubylode-glitchtip-source-link[href=?]", "#{BASE_URL}/#{ORGANIZATION}/issues"
+  end
+
+  test "the Status page has no link while the block is not configured" do
+    configure_plugin("base_url" => "", "organization_slug" => "")
+    log_user("jsmith", "jsmith")
+    get "/status"
+
+    assert_select "a.rubylode-glitchtip-source-link", 0
+  end
+
   test "a person who may not see the block does not get it on the Status page" do
     configure_plugin("visibility" => "admins")
     log_user("jsmith", "jsmith")

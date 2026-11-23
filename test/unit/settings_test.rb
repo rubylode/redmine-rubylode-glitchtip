@@ -161,4 +161,28 @@ class RubylodeGlitchtip::SettingsTest < ActiveSupport::TestCase
     assert_equal "Errors", configuration("block_title" => "  ").block_title
     assert_equal "Alerts", configuration("block_title" => "Alerts").block_title
   end
+
+  test "the source link address is the organization's issues page under the base address" do
+    result = configuration("base_url" => "https://glitchtip.example.com/", "organization_slug" => "example-org")
+
+    assert_equal "https://glitchtip.example.com/example-org/issues", result.source_link_address
+  end
+
+  test "the source link address encodes the organization slug the way the issue links do" do
+    result = configuration("base_url" => "https://glitchtip.example.com", "organization_slug" => "a_b-c")
+
+    assert_equal "https://glitchtip.example.com/a_b-c/issues", result.source_link_address
+    assert_equal "https://glitchtip.example.com/a_b-c/issues/42", result.issue_address("42")
+  end
+
+  test "the source link address is nil while the block is not configured" do
+    assert_nil configuration.source_link_address
+    assert_nil configuration("base_url" => "https://glitchtip.example.com").source_link_address
+    assert_nil configuration("organization_slug" => "example-org").source_link_address
+  end
+
+  test "the source link address is nil for an address that is not http or https" do
+    assert_nil configuration("base_url" => "ftp://glitchtip.example.com", "organization_slug" => "example-org").source_link_address
+    assert_nil configuration("base_url" => "javascript:alert(1)", "organization_slug" => "example-org").source_link_address
+  end
 end

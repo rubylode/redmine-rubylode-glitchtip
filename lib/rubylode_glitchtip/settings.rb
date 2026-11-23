@@ -174,6 +174,19 @@ module RubylodeGlitchtip
       visibility == "admins" ? user.admin? : true
     end
 
+    # The organization's issues page in GlitchTip, the address the "Open GlitchTip" link opens. Nil while the block is not
+    # configured or when the base address is not an http or https address. It holds no token.
+    def source_link_address
+      return nil unless configured? && base_url.match?(%r{\Ahttps?://}i)
+
+      "#{organization_address}/issues"
+    end
+
+    # One issue's page in GlitchTip, from the saved address and the issue's id.
+    def issue_address(issue_id)
+      "#{organization_address}/issues/#{issue_id}"
+    end
+
     def configured?
       !base_url.empty? && !organization_slug.empty?
     end
@@ -185,6 +198,10 @@ module RubylodeGlitchtip
     end
 
     private
+
+    def organization_address
+      "#{base_url}/#{ERB::Util.url_encode(organization_slug)}"
+    end
 
     def flag?(key)
       @settings[key].to_s == "1"

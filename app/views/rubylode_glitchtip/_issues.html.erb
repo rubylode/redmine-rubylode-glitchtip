@@ -15,7 +15,7 @@
       <% level = RubylodeGlitchtip::Settings::LEVELS.include?(issue.level) ? issue.level : "unknown" %>
       <tr class="rubylode-glitchtip-errors-row is-<%= level %>">
         <td class="rubylode-glitchtip-errors-title-cell">
-          <%= link_to issue.title.presence || issue.short_id, "#{settings.base_url}/#{ERB::Util.url_encode(settings.organization_slug)}/issues/#{issue.id}",
+          <%= link_to issue.title.presence || issue.short_id, settings.issue_address(issue.id),
                       class: "rubylode-glitchtip-errors-link", title: l("rubylode_glitchtip.open_in_glitchtip"), rel: "noopener noreferrer", target: "_blank" %>
           <% if issue.culprit.present? %><span class="rubylode-glitchtip-errors-culprit"><%= issue.culprit %></span><% end %>
         </td>

@@ -3,15 +3,19 @@
     without project and culprit), inline_stylesheet (true when the page has already sent its head). It draws nothing for a person the
     settings do not allow, and a hint for administrators while the plugin is not set up. Everything GlitchTip supplies
     (titles, culprits, project names) is escaped by ERB; the issue link is built from the saved address and a numeric id.
+    The "Open GlitchTip" link shows whenever the block is configured, also while GlitchTip does not answer.
     On the Status page the Status plugin passes the locals widget and status; the partial then draws only the table, because
     that page draws the title and the summary itself. %>
 <% if local_assigns[:widget] %>
   <%# On the Status page: only the table. The page already shows the title, the state and the summary. %>
   <% content_for :header_tags, stylesheet_link_tag("rubylode_glitchtip", plugin: "redmine_rubylode_glitchtip") %>
   <% report = status.data[:report] %>
-  <% if report&.issues&.any? %>
+  <% widget_settings = RubylodeGlitchtip::Settings.current %>
+  <% source_link_address = widget_settings.source_link_address if report %>
+  <% if source_link_address || report&.issues&.any? %>
     <div class="rubylode-glitchtip-errors">
-      <%= render partial: "rubylode_glitchtip/issues", locals: { report: report, settings: RubylodeGlitchtip::Settings.current } %>
+      <% if source_link_address %><%= render partial: "rubylode_glitchtip/source_link", locals: { address: source_link_address } %><% end %>
+      <%= render partial: "rubylode_glitchtip/issues", locals: { report: report, settings: widget_settings } %>
     </div>
   <% end %>
 <% else %>
@@ -31,6 +35,7 @@
         <% if report.unavailable? && User.current.admin? %>
           <p class="rubylode-glitchtip-errors-hint"><%= l("rubylode_glitchtip.hints.reason", reason: report.failure_reason) %></p>
         <% end %>
+        <% if configuration.source_link_address %><%= render partial: "rubylode_glitchtip/source_link", locals: { address: configuration.source_link_address } %><% end %>
         <%= render partial: "rubylode_glitchtip/issues", locals: { report: report, settings: configuration } %>
       </div>
     <% elsif User.current.admin? %>

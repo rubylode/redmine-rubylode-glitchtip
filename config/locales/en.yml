@@ -39,6 +39,7 @@ en:
       unknown: Unknown
     last_seen_ago: "%{time} ago"
     open_in_glitchtip: Open in GlitchTip
+    open_glitchtip: Open GlitchTip
     hints:
       not_configured: "Recent errors are not set up yet. Add the GlitchTip address and the organization in the plugin settings."
       not_configured_link: Open the settings

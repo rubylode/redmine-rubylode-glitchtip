@@ -204,6 +204,12 @@ table.list.rubylode-glitchtip-errors-table .rubylode-glitchtip-errors-last-seen 
   display: none;
 }
 
+/* The link that opens GlitchTip, right-aligned between the summary and the table. */
+.rubylode-glitchtip-source-link-line {
+  margin: 0 0 var(--rubylode-glitchtip-gap);
+  text-align: right;
+}
+
 /* The help on the settings page. Redmine's tabular form indents every paragraph for a label, which text does not need. */
 .rubylode-glitchtip-help p,
 .tabular .rubylode-glitchtip-help p {

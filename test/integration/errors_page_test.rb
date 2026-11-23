@@ -55,6 +55,36 @@ class RubylodeGlitchtip::ErrorsPageTest < Redmine::IntegrationTest
     assert_select "tbody tr", 1
   end
 
+  test "the page links to the organization's issues page in GlitchTip, above the table" do
+    publish_issues([recent(id: "7")])
+
+    log_user("jsmith", "jsmith")
+    get "/status/glitchtip"
+
+    assert_select "a.rubylode-glitchtip-source-link.external[href=?]", "#{BASE_URL}/#{ORGANIZATION}/issues", text: "Open GlitchTip"
+    assert_select "a.rubylode-glitchtip-source-link[target]", 0
+    assert_select ".rubylode-glitchtip-source-link-line ~ table.rubylode-glitchtip-errors-table"
+  end
+
+  test "the link shows when GlitchTip cannot be reached" do
+    publish_failure("timeout")
+
+    log_user("jsmith", "jsmith")
+    get "/status/glitchtip"
+
+    assert_select ".rubylode-glitchtip-errors-summary.is-unavailable"
+    assert_select "a.rubylode-glitchtip-source-link[href=?]", "#{BASE_URL}/#{ORGANIZATION}/issues"
+  end
+
+  test "the link is absent while the block is not configured" do
+    configure_plugin("base_url" => "", "organization_slug" => "")
+
+    log_user("admin", "admin")
+    get "/status/glitchtip"
+
+    assert_select "a.rubylode-glitchtip-source-link", 0
+  end
+
   test "the issue link opens in a new tab without leaking the referrer" do
     publish_issues([recent(id: "7")])
 
